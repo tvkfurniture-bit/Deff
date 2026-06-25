@@ -34,7 +34,7 @@ st.set_page_config(
 # ══════════════════════════════════════════════════════════════════════════════
 # DESIGN SYSTEM — Theme-Adaptive Terminal Aesthetic
 # Typography: JetBrains Mono (data) + Inter (UI)
-# Supporting flawless execution in both Dark and Light System settings.
+# Supporting execution in both Dark and Light System settings.
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
@@ -651,6 +651,14 @@ header[data-testid="stHeader"] {
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
+# HTML RENDER HELPER (Ensures raw Markdown is not processed inside HTML)
+# ══════════════════════════════════════════════════════════════════════════════
+def render_html(html_str: str):
+    """Safely collapse and output HTML strings to prevent Markdown code block bugs."""
+    clean_html = " ".join(html_str.split())
+    st.markdown(clean_html, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
 # CONSTANTS & CONFIG
 # ══════════════════════════════════════════════════════════════════════════════
 INDICES = {
@@ -1095,7 +1103,6 @@ def get_atm_strike(ltp: float, index_name: str) -> dict:
     }
 
 def position_size(capital: float, risk_pct: float, sl_pts: float, lot_size: int) -> dict:
-    # CRITICAL FIX: Ensure 'margin_est' is returned in all evaluation paths.
     if sl_pts <= 0 or lot_size <= 0:
         return {"lots": 0, "risk_amount": 0, "margin_est": 0}
     risk_amt = capital * risk_pct / 100
@@ -1238,7 +1245,6 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
             ), row=3, col=1)
 
     # ── Layout ───────────────────────────────────────────────────────────────
-    # Neutral Grid values allowing flawless rendering in Dark & Light Modes
     GRID  = "rgba(120,120,120,0.15)"
     PAPER = "rgba(0,0,0,0)"
     fig.update_layout(
@@ -1357,21 +1363,15 @@ def score_arc_svg(score: float, signal: str) -> str:
     sig_color = {"BUY": "#00FFA3", "SELL": "#FF4B4B", "NONE": "#5B8CFF"}.get(signal, "#5B8CFF")
     sig_label = signal if signal != "NONE" else "WAIT"
 
-    return f"""
+    svg_str = f"""
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="110" height="110">
-      <path d="M {cx + r * np.cos(135 * np.pi/180):.2f} {cy + r * np.sin(135 * np.pi/180):.2f}
-               A {r} {r} 0 1 1 {cx + r * np.cos(45 * np.pi/180):.2f} {cy + r * np.sin(45 * np.pi/180):.2f}"
-            fill="none" stroke="rgba(120,120,120,0.15)" stroke-width="6"
-            stroke-linecap="round"/>
-      {'<path d="M ' + f'{x1:.2f} {y1:.2f} A {r} {r} 0 {large} 1 {x2:.2f} {y2:.2f}"' +
-       f' fill="none" stroke="{color}" stroke-width="6" stroke-linecap="round"/>' if pct > 0 else ''}
-      <text x="50" y="47" text-anchor="middle" dominant-baseline="middle"
-            font-family="JetBrains Mono" font-size="18" font-weight="700" fill="{color}">{int(score)}</text>
-      <text x="50" y="62" text-anchor="middle" dominant-baseline="middle"
-            font-family="Inter" font-size="6.5" font-weight="700" fill="{sig_color}"
-            letter-spacing="1">{sig_label}</text>
+      <path d="M {cx + r * np.cos(135 * np.pi/180):.2f} {cy + r * np.sin(135 * np.pi/180):.2f} A {r} {r} 0 1 1 {cx + r * np.cos(45 * np.pi/180):.2f} {cy + r * np.sin(45 * np.pi/180):.2f}" fill="none" stroke="rgba(120,120,120,0.15)" stroke-width="6" stroke-linecap="round"/>
+      {'<path d="M ' + f'{x1:.2f} {y1:.2f} A {r} {r} 0 {large} 1 {x2:.2f} {y2:.2f}"' + f' fill="none" stroke="{color}" stroke-width="6" stroke-linecap="round"/>' if pct > 0 else ''}
+      <text x="50" y="47" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="18" font-weight="700" fill="{color}">{int(score)}</text>
+      <text x="50" y="62" text-anchor="middle" dominant-baseline="middle" font-family="Inter" font-size="6.5" font-weight="700" fill="{sig_color}" letter-spacing="1">{sig_label}</text>
     </svg>
     """
+    return " ".join(svg_str.split())
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SESSION STATE INIT
@@ -1427,6 +1427,7 @@ with st.sidebar:
     st.markdown("---")
     dot_c  = "#00FFA3" if is_open else "#FF4B4B"
     mkt_s  = "LIVE · NSE/BSE" if is_open else "CLOSED · NSE/BSE"
+    
     st.markdown(f"""
     <div style="font-size:0.67rem;font-weight:700;letter-spacing:0.1em;color:{dot_c}">
       <span class="qx-dot" style="background:{dot_c};box-shadow:0 0 6px {dot_c}"></span>
@@ -1505,7 +1506,7 @@ ks_html = ""
 if kill_sw:
     ks_html = f'<span class="qx-chip qx-chip-red">⛔ HALTED — {kill_reason[:35]}</span>'
 
-st.markdown(f"""
+header_html = f"""
 <div class="qx-header">
   <div class="qx-header-left">
     <div>
@@ -1523,10 +1524,11 @@ st.markdown(f"""
     <span class="qx-chip qx-chip-gray" style="font-family:'JetBrains Mono',monospace">{ts_now}</span>
   </div>
 </div>
-""", unsafe_allow_html=True)
+"""
+render_html(header_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SIGNAL BANNER
+# SIGNAL BANNER (Fixed parsing bug using render_html with flat string generation)
 # ══════════════════════════════════════════════════════════════════════════════
 s      = sig["signal"]
 sc     = "buy" if s == "BUY" else ("sell" if s == "SELL" else "none")
@@ -1542,7 +1544,7 @@ kill_note = ""
 if sig.get("kill_reason"):
     kill_note = f'<span style="font-size:0.65rem;color:rgba(255,75,75,0.7);font-family:JetBrains Mono,monospace">{sig["kill_reason"]}</span>'
 
-st.markdown(f"""
+banner_html = f"""
 <div class="qx-signal-banner {sc}">
   <div class="qx-signal-main">
     <div style="font-size:2.4rem;line-height:1">{s_icon}</div>
@@ -1565,7 +1567,8 @@ st.markdown(f"""
     <div class="qx-score-label">Signal Score</div>
   </div>
 </div>
-""", unsafe_allow_html=True)
+"""
+render_html(banner_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # METRIC CARDS ROW
@@ -1577,65 +1580,71 @@ vol_above = vwap_val > 0 and ltp > vwap_val
 c1, c2, c3, c4, c5, c6 = st.columns(6)
 
 with c1:
-    st.markdown(f"""
+    card1 = f"""
     <div class="qx-card qx-card-blue">
       <div class="qx-card-icon">📈</div>
       <div class="qx-card-label">LTP · {selected_label}</div>
       <div class="qx-card-value">₹{ltp:,.2f}</div>
       <div class="qx-card-sub"><span class="{chg_cls}">{chg_arrow} {abs(day_chg_pct):.2f}%</span> &nbsp;today</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card1)
 
 with c2:
     sl_pct = (abs(ltp - (sig["sl"] or ltp)) / ltp * 100) if sig["sl"] and ltp else 0
-    st.markdown(f"""
+    card2 = f"""
     <div class="qx-card qx-card-red">
       <div class="qx-card-icon">🛡</div>
       <div class="qx-card-label">Stop Loss · 1.5× ATR</div>
       <div class="qx-card-value clr-red">{sl_txt}</div>
       <div class="qx-card-sub">Risk {sl_pct:.2f}% &nbsp;·&nbsp; ATR ₹{volatility:,.1f}</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card2)
 
 with c3:
     rr_pts = abs((sig["target"] or ltp) - ltp) if sig["target"] else 0
-    st.markdown(f"""
+    card3 = f"""
     <div class="qx-card qx-card-green">
       <div class="qx-card-icon">🎯</div>
       <div class="qx-card-label">Target · 1:2 R/R</div>
       <div class="qx-card-value clr-green">{tgt_txt}</div>
       <div class="qx-card-sub">Reward ₹{rr_pts:,.1f} &nbsp;·&nbsp; 1:2 ratio</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card3)
 
 with c4:
     vwap_cls  = "clr-green" if vol_above else "clr-red"
     vwap_side = "ABOVE" if vol_above else "BELOW"
-    st.markdown(f"""
+    card4 = f"""
     <div class="qx-card qx-card-amber">
       <div class="qx-card-icon">⚖</div>
       <div class="qx-card-label">VWAP · Institutional</div>
       <div class="qx-card-value">₹{vwap_val:,.1f}</div>
       <div class="qx-card-sub">Price <span class="{vwap_cls}">{vwap_side}</span> VWAP</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card4)
 
 with c5:
     adx_txt = "STRONG" if adx_val > 25 else ("WEAK" if adx_val < 18 else "MOD")
     adx_cls = "clr-green" if adx_val > 25 else ("clr-red" if adx_val < 18 else "clr-amber")
-    st.markdown(f"""
+    card5 = f"""
     <div class="qx-card qx-card-neutral">
       <div class="qx-card-icon">📡</div>
       <div class="qx-card-label">ADX · Trend Strength</div>
       <div class="qx-card-value">{adx_val:.1f}</div>
       <div class="qx-card-sub"><span class="{adx_cls}">{adx_txt} TREND</span> &nbsp;·&nbsp; RSI {rsi_val:.1f}</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card5)
 
 with c6:
     wr_cls = "clr-green" if bt["win_rate"] >= 55 else ("clr-amber" if bt["win_rate"] >= 40 else "clr-red")
-    st.markdown(f"""
+    card6 = f"""
     <div class="qx-card {'qx-card-green' if bt['win_rate'] >= 55 else ('qx-card-amber' if bt['win_rate'] >= 40 else 'qx-card-red')}">
       <div class="qx-card-icon">🏆</div>
       <div class="qx-card-label">Backtest Win Rate</div>
       <div class="qx-card-value {wr_cls}">{bt['win_rate']}%</div>
       <div class="qx-card-sub">{bt['wins']}W / {bt['losses']}L &nbsp;·&nbsp; {bt['total']} trades</div>
-    </div>""", unsafe_allow_html=True)
+    </div>"""
+    render_html(card6)
 
 st.markdown("<div style='height:0.8rem'></div>", unsafe_allow_html=True)
 
@@ -1688,13 +1697,14 @@ with tab1:
         align_note_color = "clr-green" if align_total >= 2 else ("clr-red" if align_total <= -2 else "clr-amber")
         align_note = f"{'Bullish' if align_total > 0 else 'Bearish' if align_total < 0 else 'Mixed'} ({bull_count}↑ {bear_count}↓)"
 
-        st.markdown(f"""
+        mtf_table_html = f"""
         <table class="qx-mtf-table">
           <thead><tr><th>TF</th><th>Bias</th><th>RSI</th></tr></thead>
           <tbody>{mtf_rows}</tbody>
         </table>
         <p style="font-size:0.65rem;margin-top:0.6rem" class="{align_note_color}">Alignment: {align_note}</p>
-        """, unsafe_allow_html=True)
+        """
+        render_html(mtf_table_html)
 
         st.markdown('<div class="qx-section">Fibonacci Pivots</div>', unsafe_allow_html=True)
         if pivots:
@@ -1712,11 +1722,13 @@ with tab1:
                   <td class="{cls}" style="font-weight:600">₹{v:,.0f}</td>
                   <td class="{dc}" style="text-align:right;font-size:0.7rem">{diff:+.2f}%</td>
                 </tr>"""
-            st.markdown(f"""
+            
+            pivots_html = f"""
             <table class="qx-pivot-table">
               <thead><tr><th>Level</th><th></th><th>Price</th><th style="text-align:right">vs LTP</th></tr></thead>
               <tbody>{rows_html}</tbody>
-            </table>""", unsafe_allow_html=True)
+            </table>"""
+            render_html(pivots_html)
         else:
             st.markdown('<p style="opacity:0.5;font-size:0.78rem">Pivot data unavailable</p>', unsafe_allow_html=True)
 
@@ -1730,7 +1742,7 @@ with tab1:
                 sl_s  = f"SL ₹{e['sl']:,.0f}" if e["sl"] else ""
                 tgt_s = f"T ₹{e['target']:,.0f}" if e["target"] else ""
                 sc_s  = f"Score {e.get('score',0):.0f}" if e.get("score") else ""
-                st.markdown(f"""
+                log_entry_html = f"""
                 <div class="qx-log-entry">
                   <div>
                     <div class="qx-log-time">{e['time']}</div>
@@ -1739,7 +1751,8 @@ with tab1:
                     <div class="qx-log-levels">{sl_s} &nbsp; {tgt_s} &nbsp; {sc_s}</div>
                   </div>
                   <span class="qx-log-badge {bc}">{e['signal']}</span>
-                </div>""", unsafe_allow_html=True)
+                </div>"""
+                render_html(log_entry_html)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 2 — BACKTEST RESULTS
@@ -1748,9 +1761,10 @@ with tab2:
     st.markdown('<div class="qx-section">Walk-Forward Backtest · Last 40 Bars</div>', unsafe_allow_html=True)
 
     if kill_sw:
-        st.markdown(f'<div class="qx-ks-halted">⛔ &nbsp; AUTO KILL-SWITCH ACTIVE — {kill_reason}</div>', unsafe_allow_html=True)
+        ks_banner = f'<div class="qx-ks-halted">⛔ &nbsp; AUTO KILL-SWITCH ACTIVE — {kill_reason}</div>'
     else:
-        st.markdown('<div class="qx-ks-active">✅ &nbsp; SIGNALS ACTIVE — Win rate above threshold</div>', unsafe_allow_html=True)
+        ks_banner = '<div class="qx-ks-active">✅ &nbsp; SIGNALS ACTIVE — Win rate above threshold</div>'
+    render_html(ks_banner)
 
     st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
 
@@ -1769,11 +1783,12 @@ with tab2:
     ]
     for col, val, lbl, vc in stat_cards:
         with col:
-            st.markdown(f"""
+            bt_card = f"""
             <div class="qx-bt-stat">
               <div class="qx-bt-stat-val {vc}">{val}</div>
               <div class="qx-bt-stat-lbl">{lbl}</div>
-            </div>""", unsafe_allow_html=True)
+            </div>"""
+            render_html(bt_card)
 
     st.markdown("<div style='height:0.8rem'></div>", unsafe_allow_html=True)
 
@@ -1814,10 +1829,7 @@ with tab3:
     with col_opt:
         st.markdown('<div class="qx-section">F&O Strike Suggester</div>', unsafe_allow_html=True)
 
-        ce_color = "qx-card-green" if s == "BUY" else "qx-card-neutral"
-        pe_color = "qx-card-red"   if s == "SELL" else "qx-card-neutral"
-
-        st.markdown(f"""
+        opt_cards_html = f"""
         <div class="qx-opt-card" style="border-left:3px solid rgba(0,255,163,0.4)">
           <div class="qx-opt-header">BUY SIGNAL → CALL OPTION (CE)</div>
           <div class="qx-opt-strike">{atm_data['ce']:,} CE</div>
@@ -1836,7 +1848,8 @@ with tab3:
             OTM PE: <strong>{atm_data['otm_pe']:,}</strong>
           </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        render_html(opt_cards_html)
 
         st.markdown('<div class="qx-section">Index Specifications</div>', unsafe_allow_html=True)
         spec_rows = ""
@@ -1850,11 +1863,13 @@ with tab3:
               <td>{LOT_SIZES[idx_n]}</td>
               <td>{STRIKE_GAPS[idx_n]}</td>
             </tr>"""
-        st.markdown(f"""
+        
+        spec_table_html = f"""
         <table class="qx-pivot-table">
           <thead><tr><th>Index</th><th>Lot Size</th><th>Strike Gap</th></tr></thead>
           <tbody>{spec_rows}</tbody>
-        </table>""", unsafe_allow_html=True)
+        </table>"""
+        render_html(spec_table_html)
 
     with col_pos:
         st.markdown('<div class="qx-section">Position Size Calculator</div>', unsafe_allow_html=True)
@@ -1862,7 +1877,7 @@ with tab3:
         sl_pts = abs(ltp - (sig["sl"] or ltp))
         pos    = position_size(capital, risk_pct, sl_pts, lot_size)
 
-        st.markdown(f"""
+        pos_sizing_html = f"""
         <div class="qx-opt-card">
           <div class="qx-opt-header">Capital & Risk Parameters</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem">
@@ -1906,7 +1921,8 @@ with tab3:
             ◈ &nbsp;Exit before 15:15 IST (avoid expiry theta)
           </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        render_html(pos_sizing_html)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 4 — ANALYTICS
@@ -1970,18 +1986,21 @@ with tab4:
               <td style="opacity:0.6;font-size:0.72rem">{lbl}</td>
               <td class="{vc}" style="font-weight:600;font-size:0.78rem">{val}</td>
             </tr>"""
-        st.markdown(f"""
+        
+        snapshot_table_html = f"""
         <table class="qx-pivot-table">
           <thead><tr><th>Indicator</th><th>Value</th></tr></thead>
           <tbody>{rows_html}</tbody>
-        </table>""", unsafe_allow_html=True)
+        </table>"""
+        render_html(snapshot_table_html)
 
     with col_b:
         st.markdown('<div class="qx-section">Session Summary</div>', unsafe_allow_html=True)
         log = st.session_state.get("trade_log", [])
         sess_buy  = sum(1 for e in log if e["signal"] == "BUY")
         sess_sell = sum(1 for e in log if e["signal"] == "SELL")
-        st.markdown(f"""
+        
+        session_summary_html = f"""
         <div class="qx-opt-card">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
             <div style="text-align:center">
@@ -1998,7 +2017,8 @@ with tab4:
             </div>
           </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        render_html(session_summary_html)
 
         st.markdown('<div class="qx-section">Full Signal Log</div>', unsafe_allow_html=True)
         if log:
@@ -2039,11 +2059,13 @@ with tab4:
               <td style="opacity:0.6;font-size:0.72rem">{lbl}</td>
               <td class="{vc}" style="font-weight:700;font-size:0.72rem;font-family:'JetBrains Mono',monospace">{val}</td>
             </tr>"""
-        st.markdown(f"""
+        
+        status_table_html = f"""
         <table class="qx-pivot-table">
           <thead><tr><th>Component</th><th>Status</th></tr></thead>
           <tbody>{rows_html}</tbody>
-        </table>""", unsafe_allow_html=True)
+        </table>"""
+        render_html(status_table_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FOOTER
