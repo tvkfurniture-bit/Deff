@@ -28,12 +28,11 @@ st.set_page_config(
     page_title="QuantX · F&O Terminal",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed", # Collapsed by default for a better mobile view
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DESIGN SYSTEM — Theme-Adaptive Terminal Aesthetic
-# Typography: JetBrains Mono (data) + Inter (UI)
 # Supporting execution in both Dark and Light System settings.
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
@@ -54,8 +53,8 @@ html, body, [class*="css"], .stApp {
     0deg,
     transparent,
     transparent 2px,
-    rgba(120,120,120,0.015) 2px,
-    rgba(120,120,120,0.015) 4px
+    rgba(120,120,120,0.01) 2px,
+    rgba(120,120,120,0.01) 4px
   );
   pointer-events: none;
   z-index: 0;
@@ -70,14 +69,9 @@ header[data-testid="stHeader"] {
   background: transparent !important;
   height: 0 !important;
 }
-[data-testid="stSidebarCollapsedControl"] {
-  display: flex !important;
-  visibility: visible !important;
-  z-index: 99999 !important;
-}
 
 .block-container {
-  padding: 1.2rem 2rem 3rem 2rem !important;
+  padding: 1rem 1rem 3rem 1rem !important;
   max-width: 100% !important;
 }
 
@@ -88,28 +82,6 @@ header[data-testid="stHeader"] {
 }
 [data-testid="stSidebar"] > div:first-child {
   padding-top: 1.5rem;
-}
-
-/* ── Sidebar widgets ──────────────────────────────────────────────────────── */
-[data-testid="stSidebar"] .stSelectbox > label,
-[data-testid="stSidebar"] .stRadio > label,
-[data-testid="stSidebar"] .stToggle > label,
-[data-testid="stSidebar"] .stSlider > label {
-  font-size: 0.62rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  opacity: 0.7;
-}
-[data-testid="stSidebar"] [data-baseweb="select"] > div {
-  border-radius: 8px !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.82rem !important;
-}
-[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.78rem !important;
-  font-weight: 600 !important;
 }
 
 /* ── Tab styling ──────────────────────────────────────────────────────────── */
@@ -128,18 +100,18 @@ header[data-testid="stHeader"] {
   font-weight: 700 !important;
   letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
-  padding: 0.7rem 1.4rem !important;
+  padding: 0.7rem 1rem !important;
   transition: all 0.2s !important;
 }
 [data-testid="stTabs"] [aria-selected="true"] {
-  color: #00FFA3 !important;
-  border-bottom: 2px solid #00FFA3 !important;
+  color: #00E676 !important;
+  border-bottom: 2px solid #00E676 !important;
 }
 [data-testid="stTabs"] [data-baseweb="tab"]:hover {
   background: rgba(120, 120, 120, 0.05) !important;
 }
 [data-testid="stTabPanel"] {
-  padding-top: 1.5rem !important;
+  padding-top: 1rem !important;
   background: transparent !important;
 }
 
@@ -156,17 +128,6 @@ header[data-testid="stHeader"] {
   overflow: hidden !important;
 }
 
-/* ── Spinner ──────────────────────────────────────────────────────────────── */
-[data-testid="stSpinner"] { color: #00FFA3 !important; }
-
-/* ── Alerts ───────────────────────────────────────────────────────────────── */
-[data-testid="stAlert"] {
-  background: rgba(255,75,75,0.08) !important;
-  border: 1px solid rgba(255,75,75,0.25) !important;
-  border-radius: 10px !important;
-  color: #FF6B6B !important;
-}
-
 /* ════════════════════════════════════════════════════════════════════════════
    CUSTOM THEME ADAPTIVE COMPONENTS
    ════════════════════════════════════════════════════════════════════════════ */
@@ -179,7 +140,7 @@ header[data-testid="stHeader"] {
   line-height: 1;
   margin-bottom: 0.1rem;
 }
-.qx-wordmark .acc { color: #00FFA3; text-shadow: 0 0 20px rgba(0,255,163,0.3); }
+.qx-wordmark .acc { color: #00E676; text-shadow: 0 0 20px rgba(0,230,118,0.3); }
 .qx-tagline {
   font-size: 0.6rem;
   letter-spacing: 0.18em;
@@ -228,7 +189,7 @@ header[data-testid="stHeader"] {
   background: rgba(120, 120, 120, 0.05);
   border: 1px solid rgba(120, 120, 120, 0.15);
   border-radius: 12px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   backdrop-filter: blur(20px);
 }
 .qx-header-left {
@@ -258,9 +219,9 @@ header[data-testid="stHeader"] {
   letter-spacing: 0.05em;
 }
 .qx-chip-green {
-  background: rgba(0,255,163,0.1);
-  border: 1px solid rgba(0,255,163,0.3);
-  color: #00FFA3;
+  background: rgba(0,230,118,0.1);
+  border: 1px solid rgba(0,230,118,0.3);
+  color: #00E676;
 }
 .qx-chip-red {
   background: rgba(255,75,75,0.1);
@@ -272,23 +233,27 @@ header[data-testid="stHeader"] {
   border: 1px solid rgba(255,179,71,0.3);
   color: #FFB347;
 }
-.qx-chip-blue {
-  background: rgba(91,140,255,0.1);
-  border: 1px solid rgba(91,140,255,0.3);
-  color: #5B8CFF;
-}
 .qx-chip-gray {
   background: rgba(120,120,120,0.1);
   border: 1px solid rgba(120,120,120,0.2);
 }
 
-/* ── Custom Theme Adaptive Cards ──────────────────────────────────────────── */
+/* ── Mobile Responsive Metrics Flex Grid ─────────────────────────────────── */
+.qx-metrics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
 .qx-card {
+  flex: 1 1 150px; /* Highly scalable minimum size for phone layout */
   position: relative;
   background: rgba(120, 120, 120, 0.05);
   border: 1px solid rgba(120, 120, 120, 0.15);
-  border-radius: 14px;
-  padding: 1.1rem 1.25rem;
+  border-radius: 12px;
+  padding: 1rem;
   overflow: hidden;
   transition: border-color 0.25s, box-shadow 0.25s;
 }
@@ -299,9 +264,9 @@ header[data-testid="stHeader"] {
   height: 2px;
   opacity: 0.9;
 }
-.qx-card-green { border-color: rgba(0,255,163,0.15); }
-.qx-card-green::before { background: linear-gradient(90deg, #00FFA3 0%, transparent 70%); }
-.qx-card-green:hover { border-color: rgba(0,255,163,0.35); box-shadow: 0 0 24px rgba(0,255,163,0.06); }
+.qx-card-green { border-color: rgba(0,230,118,0.15); }
+.qx-card-green::before { background: linear-gradient(90deg, #00E676 0%, transparent 70%); }
+.qx-card-green:hover { border-color: rgba(0,230,118,0.35); box-shadow: 0 0 24px rgba(0,230,118,0.06); }
 
 .qx-card-red { border-color: rgba(255,75,75,0.15); }
 .qx-card-red::before { background: linear-gradient(90deg, #FF4B4B 0%, transparent 70%); }
@@ -319,35 +284,35 @@ header[data-testid="stHeader"] {
 .qx-card-neutral::before { background: linear-gradient(90deg, rgba(120, 120, 120, 0.4) 0%, transparent 70%); }
 
 .qx-card-label {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.6;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.4rem;
 }
 .qx-card-value {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 .qx-card-sub {
-  font-size: 0.67rem;
+  font-size: 0.62rem;
   margin-top: 0.35rem;
   font-weight: 400;
   opacity: 0.8;
 }
 .qx-card-icon {
   position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  font-size: 1.1rem;
+  top: 0.8rem;
+  right: 0.8rem;
+  font-size: 0.9rem;
   opacity: 0.15;
 }
 
-.clr-green  { color: #00FFA3 !important; }
+.clr-green  { color: #00E676 !important; }
 .clr-red    { color: #FF4B4B !important; }
 .clr-blue   { color: #5B8CFF !important; }
 .clr-amber  { color: #FFB347 !important; }
@@ -371,10 +336,10 @@ header[data-testid="stHeader"] {
   opacity: 0.04;
 }
 .qx-signal-banner.buy {
-  border-color: rgba(0,255,163,0.35);
-  background: rgba(0,255,163,0.05);
+  border-color: rgba(0,230,118,0.35);
+  background: rgba(0,230,118,0.05);
 }
-.qx-signal-banner.buy::before { background: #00FFA3; }
+.qx-signal-banner.buy::before { background: #00E676; }
 .qx-signal-banner.sell {
   border-color: rgba(255,75,75,0.35);
   background: rgba(255,75,75,0.05);
@@ -434,9 +399,9 @@ header[data-testid="stHeader"] {
   border-radius: 20px;
 }
 .qx-regime-trend {
-  background: rgba(0,255,163,0.08);
-  border: 1px solid rgba(0,255,163,0.25);
-  color: #00FFA3;
+  background: rgba(0,230,118,0.08);
+  border: 1px solid rgba(0,230,118,0.25);
+  color: #00E676;
 }
 .qx-regime-chop {
   background: rgba(255,179,71,0.08);
@@ -482,14 +447,14 @@ header[data-testid="stHeader"] {
   font-size: 0.68rem;
   font-weight: 700;
 }
-.mtf-bull { background: rgba(0,255,163,0.1); color: #00FFA3; }
+.mtf-bull { background: rgba(0,230,118,0.1); color: #00E676; }
 .mtf-bear { background: rgba(255,75,75,0.1); color: #FF4B4B; }
 .mtf-neut { background: rgba(120,120,120,0.1); }
 
 .pv-r { color: #FF6B6B; font-weight: 600; }
-.pv-s { color: #00FFA3; font-weight: 600; }
+.pv-s { color: #00E676; font-weight: 600; }
 .pv-p { color: #5B8CFF; font-weight: 600; }
-.pv-pos { color: #00FFA3; }
+.pv-pos { color: #00E676; }
 .pv-neg { color: #FF4B4B; }
 
 /* ── Trade logs ───────────────────────────────────────────────────────────── */
@@ -534,7 +499,7 @@ header[data-testid="stHeader"] {
   border-radius: 6px;
   letter-spacing: 0.06em;
 }
-.qx-log-badge.buy  { background: rgba(0,255,163,0.1); color: #00FFA3; border: 1px solid rgba(0,255,163,0.25); }
+.qx-log-badge.buy  { background: rgba(0,230,118,0.1); color: #00E676; border: 1px solid rgba(0,230,118,0.25); }
 .qx-log-badge.sell { background: rgba(255,75,75,0.1); color: #FF4B4B; border: 1px solid rgba(255,75,75,0.25); }
 
 .qx-opt-card {
@@ -554,7 +519,7 @@ header[data-testid="stHeader"] {
 }
 .qx-opt-strike {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -579,12 +544,12 @@ header[data-testid="stHeader"] {
   text-transform: uppercase;
 }
 .qx-ks-active {
-  background: rgba(0,255,163,0.05);
-  border: 1px solid rgba(0,255,163,0.2);
+  background: rgba(0,230,118,0.05);
+  border: 1px solid rgba(0,230,118,0.2);
   border-radius: 8px;
   padding: 0.55rem 0.9rem;
   font-size: 0.68rem;
-  color: #00FFA3;
+  color: #00E676;
   text-align: center;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -613,30 +578,6 @@ header[data-testid="stHeader"] {
   margin-top: 0.3rem;
 }
 
-.qx-fab {
-  position: fixed;
-  top: 0.65rem;
-  left: 0.65rem;
-  z-index: 99998;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(0,255,163,0.08);
-  border: 1px solid rgba(0,255,163,0.3);
-  border-radius: 8px;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #00FFA3;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-  transition: all 0.18s;
-}
-.qx-fab:hover { background: rgba(0,255,163,0.15); }
-
 .qx-divider {
   border: none;
   border-top: 1px solid rgba(120, 120, 120, 0.2);
@@ -646,7 +587,36 @@ header[data-testid="stHeader"] {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(120,120,120,0.2); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,255,163,0.3); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,230,118,0.3); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TRUE RESPONSIVE MEDIA QUERIES
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .block-container {
+    padding: 0.5rem 0.5rem 2rem 0.5rem !important;
+  }
+  .qx-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+  }
+  .qx-signal-banner {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+  }
+  .qx-signal-main {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .qx-opt-strike {
+    font-size: 1.15rem;
+  }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1136,10 +1106,10 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
         x=df.index,
         open=df["Open"], high=df["High"],
         low=df["Low"],   close=df["Close"],
-        increasing=dict(line=dict(color="#00CC88", width=1),
-                        fillcolor="rgba(0,204,136,0.6)"),
+        increasing=dict(line=dict(color="#00E676", width=1),
+                        fillcolor="rgba(0,230,118,0.5)"),
         decreasing=dict(line=dict(color="#FF4B4B", width=1),
-                        fillcolor="rgba(255,75,75,0.6)"),
+                        fillcolor="rgba(255,75,75,0.5)"),
         name="Price", showlegend=False,
     ), row=1, col=1)
 
@@ -1147,12 +1117,12 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
     if show_ema and "EMA9" in df.columns:
         fig.add_trace(go.Scatter(
             x=df.index, y=df["EMA9"],
-            line=dict(color="#FFD700", width=1.5),
+            line=dict(color="#FFD700", width=1.2),
             name="EMA 9", hoverinfo="skip",
         ), row=1, col=1)
         fig.add_trace(go.Scatter(
             x=df.index, y=df["EMA21"],
-            line=dict(color="#BB88FF", width=1.5),
+            line=dict(color="#BB88FF", width=1.2),
             name="EMA 21", hoverinfo="skip",
         ), row=1, col=1)
 
@@ -1160,7 +1130,7 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
     if show_vwap and "VWAP" in df.columns:
         fig.add_trace(go.Scatter(
             x=df.index, y=df["VWAP"],
-            line=dict(color="#5B8CFF", width=1.4, dash="dot"),
+            line=dict(color="#5B8CFF", width=1.2, dash="dot"),
             name="VWAP", hoverinfo="skip",
         ), row=1, col=1)
 
@@ -1168,21 +1138,21 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
     if show_bb and "BB_U" in df.columns:
         fig.add_trace(go.Scatter(
             x=df.index, y=df["BB_U"],
-            line=dict(color="rgba(255,179,71,0.5)", width=0.9),
+            line=dict(color="rgba(255,179,71,0.4)", width=0.8),
             name="BB Upper", hoverinfo="skip", showlegend=False,
         ), row=1, col=1)
         fig.add_trace(go.Scatter(
             x=df.index, y=df["BB_L"],
-            line=dict(color="rgba(255,179,71,0.5)", width=0.9),
+            line=dict(color="rgba(255,179,71,0.4)", width=0.8),
             name="BB Lower", hoverinfo="skip", showlegend=False,
-            fill="tonexty", fillcolor="rgba(255,179,71,0.03)",
+            fill="tonexty", fillcolor="rgba(255,179,71,0.02)",
         ), row=1, col=1)
 
     # ── Pivot levels ─────────────────────────────────────────────────────────
     pv_style = {
         "R2": ("#FF4B4B", "dash"), "R1": ("#FF8888", "dot"),
         "P":  ("#5B8CFF", "dash"),
-        "S1": ("#66EEB0", "dot"),  "S2": ("#00FFA3", "dash"),
+        "S1": ("#66EEB0", "dot"),  "S2": ("#00E676", "dash"),
     }
     for lvl, val in pivots.items():
         col, dsh = pv_style.get(lvl, ("#888", "dash"))
@@ -1196,7 +1166,7 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
     # ── Signal markers ───────────────────────────────────────────────────────
     if sig["signal"] != "NONE" and sig["entry"]:
         icon  = "▲" if sig["signal"] == "BUY" else "▼"
-        color = "#00FFA3" if sig["signal"] == "BUY" else "#FF4B4B"
+        color = "#00E676" if sig["signal"] == "BUY" else "#FF4B4B"
         fig.add_trace(go.Scatter(
             x=[df.index[-1]], y=[sig["entry"]],
             mode="markers+text",
@@ -1212,8 +1182,8 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
             fig.add_hline(y=sig["sl"], line=dict(color="rgba(255,75,75,0.6)", width=1, dash="dot"),
                           annotation_text="  SL", annotation_font=dict(color="#FF4B4B", size=9), row=1, col=1)
         if sig["target"]:
-            fig.add_hline(y=sig["target"], line=dict(color="rgba(0,255,163,0.6)", width=1, dash="dot"),
-                          annotation_text="  TGT", annotation_font=dict(color="#00FFA3", size=9), row=1, col=1)
+            fig.add_hline(y=sig["target"], line=dict(color="rgba(0,230,118,0.6)", width=1, dash="dot"),
+                          annotation_text="  TGT", annotation_font=dict(color="#00E676", size=9), row=1, col=1)
 
     # ── RSI subplot ──────────────────────────────────────────────────────────
     if "RSI" in df.columns:
@@ -1223,15 +1193,15 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
             fill="tozeroy", fillcolor="rgba(120,120,120,0.04)",
             name="RSI",
         ), row=2, col=1)
-        for lv, cl in [(70, "rgba(255,75,75,0.4)"), (60, "rgba(0,255,163,0.35)"),
+        for lv, cl in [(70, "rgba(255,75,75,0.4)"), (60, "rgba(0,230,118,0.35)"),
                        (40, "rgba(255,75,75,0.35)"), (30, "rgba(255,75,75,0.4)")]:
             fig.add_hline(y=lv, line=dict(color=cl, width=0.6, dash="dot"), row=2, col=1)
-        fig.add_hrect(y0=60, y1=70, fillcolor="rgba(0,255,163,0.04)", line_width=0, row=2, col=1)
+        fig.add_hrect(y0=60, y1=70, fillcolor="rgba(0,230,118,0.04)", line_width=0, row=2, col=1)
         fig.add_hrect(y0=30, y1=40, fillcolor="rgba(255,75,75,0.04)", line_width=0, row=2, col=1)
 
     # ── Volume subplot ───────────────────────────────────────────────────────
     if "Volume" in df.columns:
-        vol_colors = ["rgba(0,204,136,0.55)" if float(c) >= float(o) else "rgba(255,75,75,0.55)"
+        vol_colors = ["rgba(0,230,118,0.5)" if float(c) >= float(o) else "rgba(255,75,75,0.5)"
                       for c, o in zip(df["Close"], df["Open"])]
         fig.add_trace(go.Bar(
             x=df.index, y=df["Volume"],
@@ -1263,7 +1233,7 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
         hoverlabel=dict(
             font=dict(size=10, family="JetBrains Mono"),
         ),
-        height=580,
+        height=500 if st.session_state.get('is_mobile', False) else 580,
     )
     for row_n in [1, 2, 3]:
         fig.update_xaxes(
@@ -1293,15 +1263,15 @@ def build_equity_curve(equity: list) -> go.Figure:
     x   = list(range(len(equity)))
     fig.add_trace(go.Scatter(
         x=x, y=equity,
-        line=dict(color="#00FFA3", width=2),
-        fill="tozeroy", fillcolor="rgba(0,255,163,0.06)",
+        line=dict(color="#00E676", width=2),
+        fill="tozeroy", fillcolor="rgba(0,230,118,0.06)",
         mode="lines", name="Equity",
     ))
     fig.add_hline(y=equity[0], line=dict(color="rgba(120,120,120,0.3)", width=0.8, dash="dot"))
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=10, r=10, t=20, b=10),
-        height=200,
+        height=180,
         showlegend=False,
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         yaxis=dict(gridcolor="rgba(120,120,120,0.15)", zeroline=False,
@@ -1344,7 +1314,7 @@ def market_status() -> tuple[bool, str]:
 # SCORE ARC SVG
 # ══════════════════════════════════════════════════════════════════════════════
 def score_arc_svg(score: float, signal: str) -> str:
-    color = "#00FFA3" if signal == "BUY" else ("#FF4B4B" if signal == "SELL" else "#5B8CFF")
+    color = "#00E676" if signal == "BUY" else ("#FF4B4B" if signal == "SELL" else "#5B8CFF")
     pct   = score / 100
     r     = 38
     cx, cy = 50, 50
@@ -1360,11 +1330,11 @@ def score_arc_svg(score: float, signal: str) -> str:
     y2 = cy + r * np.sin(end_angle)
     large = 1 if 270 * pct > 180 else 0
 
-    sig_color = {"BUY": "#00FFA3", "SELL": "#FF4B4B", "NONE": "#5B8CFF"}.get(signal, "#5B8CFF")
+    sig_color = {"BUY": "#00E676", "SELL": "#FF4B4B", "NONE": "#5B8CFF"}.get(signal, "#5B8CFF")
     sig_label = signal if signal != "NONE" else "WAIT"
 
     svg_str = f"""
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="110" height="110">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
       <path d="M {cx + r * np.cos(135 * np.pi/180):.2f} {cy + r * np.sin(135 * np.pi/180):.2f} A {r} {r} 0 1 1 {cx + r * np.cos(45 * np.pi/180):.2f} {cy + r * np.sin(45 * np.pi/180):.2f}" fill="none" stroke="rgba(120,120,120,0.15)" stroke-width="6" stroke-linecap="round"/>
       {'<path d="M ' + f'{x1:.2f} {y1:.2f} A {r} {r} 0 {large} 1 {x2:.2f} {y2:.2f}"' + f' fill="none" stroke="{color}" stroke-width="6" stroke-linecap="round"/>' if pct > 0 else ''}
       <text x="50" y="47" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="18" font-weight="700" fill="{color}">{int(score)}</text>
@@ -1391,57 +1361,43 @@ is_open, ts_now = market_status()
 with st.sidebar:
     st.markdown(
         '<div class="qx-wordmark">Quant<span class="acc">X</span></div>'
-        '<div class="qx-tagline">F&amp;O Intelligence Terminal · v4</div>',
+        '<div class="qx-tagline">Diagnostics & Logs</div>',
         unsafe_allow_html=True,
     )
-
-    st.markdown('<div class="qx-section">Market Index</div>', unsafe_allow_html=True)
-    selected_label = st.selectbox("Index", list(INDICES.keys()), label_visibility="collapsed")
-    ticker   = INDICES[selected_label]
-    lot_size = LOT_SIZES[selected_label]
-
-    st.markdown('<div class="qx-section">Timeframe</div>', unsafe_allow_html=True)
-    tf_label = st.radio("TF", list(TIMEFRAMES.keys()), horizontal=True, label_visibility="collapsed")
-    interval = TIMEFRAMES[tf_label]
-
-    st.markdown('<div class="qx-section">Chart Overlays</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="qx-section">Indicator Filters</div>', unsafe_allow_html=True)
     show_ema  = st.toggle("EMA 9 / 21",        value=True)
     show_vwap = st.toggle("VWAP",              value=True)
     show_bb   = st.toggle("Bollinger Bands",   value=False)
-
-    st.markdown('<div class="qx-section">Risk Management</div>', unsafe_allow_html=True)
-    capital  = st.number_input("Capital (₹)", value=st.session_state.capital,
-                                step=50000, min_value=10000, label_visibility="visible")
-    risk_pct = st.slider("Risk per Trade (%)", 0.5, 3.0, st.session_state.risk_pct, 0.25)
-    st.session_state.capital  = capital
-    st.session_state.risk_pct = risk_pct
-
-    st.markdown('<div class="qx-section">Kill Switch</div>', unsafe_allow_html=True)
-    manual_kill = st.toggle("Halt All Signals", value=False)
-
+    
+    st.markdown('<div class="qx-section">Platform Overrides</div>', unsafe_allow_html=True)
+    manual_kill = st.toggle("System Kill Switch", value=False)
+    
     st.markdown('<div class="qx-section">Auto Refresh</div>', unsafe_allow_html=True)
     refresh_sec = st.slider("Interval (sec)", 15, 120, 30, 5, label_visibility="collapsed")
     if AUTOREFRESH_AVAILABLE:
         st_autorefresh(interval=refresh_sec * 1000, key="qx_refresh")
 
-    st.markdown("---")
-    dot_c  = "#00FFA3" if is_open else "#FF4B4B"
-    mkt_s  = "LIVE · NSE/BSE" if is_open else "CLOSED · NSE/BSE"
-    
-    st.markdown(f"""
-    <div style="font-size:0.67rem;font-weight:700;letter-spacing:0.1em;color:{dot_c}">
-      <span class="qx-dot" style="background:{dot_c};box-shadow:0 0 6px {dot_c}"></span>
-      {mkt_s}
-    </div>
-    <p style="font-size:0.63rem;opacity:0.6;margin-top:0.3rem;font-family:'JetBrains Mono',monospace">{ts_now}</p>
-    <p style="font-size:0.6rem;opacity:0.5;margin-top:0.8rem">
-      Signal fires at score ≥ {SIGNAL_THRESHOLD}/100<br>
-      Auto-halts if win rate &lt; 40%
-    </p>
-    """, unsafe_allow_html=True)
+# ══════════════════════════════════════════════════════════════════════════════
+# NATIVE INTERACTIVE CONTROL EXPANDER (100% Functional Mobile Alternative)
+# ══════════════════════════════════════════════════════════════════════════════
+with st.expander("⚙️ QUANT-X CONTROL PANEL", expanded=True):
+    col_c1, col_c2, col_c3 = st.columns([1, 1, 1.2])
+    with col_c1:
+        selected_label = st.selectbox("Market Asset Index", list(INDICES.keys()))
+        ticker   = INDICES[selected_label]
+        lot_size = LOT_SIZES[selected_label]
+    with col_c2:
+        tf_label = st.selectbox("Data Timeframe Interval", list(TIMEFRAMES.keys()), index=1)
+        interval = TIMEFRAMES[tf_label]
+    with col_c3:
+        capital = st.number_input("Account Margin Capital (₹)", value=st.session_state.capital, step=50000, min_value=10000)
+        risk_pct = st.slider("Risk Exposure per Trade (%)", 0.5, 3.0, st.session_state.risk_pct, 0.25)
+        st.session_state.capital  = capital
+        st.session_state.risk_pct = risk_pct
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FETCH & COMPUTE
+# DATA FETCHING
 # ══════════════════════════════════════════════════════════════════════════════
 with st.spinner("Fetching live market data…"):
     df_raw = fetch_data(ticker, interval)
@@ -1475,21 +1431,6 @@ atm_data = get_atm_strike(ltp, selected_label)
 pos      = position_size(capital, risk_pct, abs(ltp - (sig["sl"] or ltp)), lot_size)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FLOATING CONTROL INTERFACES
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown("""
-<button class="qx-fab" onclick="(function(){
-  var b=window.parent.document.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')
-       ||window.parent.document.querySelector('[data-testid=\\'collapsedControl\\'] button');
-  if(b){b.click();}else{
-    var all=window.parent.document.querySelectorAll('button');
-    for(var i=0;i<all.length;i++){var r=all[i].getBoundingClientRect();
-      if(r.left<80&&r.top<80){all[i].click();break;}}
-  }
-})()">⚙&nbsp;Controls</button>
-""", unsafe_allow_html=True)
-
-# ══════════════════════════════════════════════════════════════════════════════
 # HEADER BAR
 # ══════════════════════════════════════════════════════════════════════════════
 regime_html = {
@@ -1498,7 +1439,7 @@ regime_html = {
     "VOLATILE": '<span class="qx-regime qx-regime-vol">◈ VOLATILE</span>',
 }.get(regime, '<span class="qx-regime qx-regime-chop">◈ UNKNOWN</span>')
 
-dot_c = "#00FFA3" if is_open else "#FF4B4B"
+dot_c = "#00E676" if is_open else "#FF4B4B"
 mkt_label = "LIVE" if is_open else "CLOSED"
 score = sig.get("score", 0)
 
@@ -1510,25 +1451,24 @@ header_html = f"""
 <div class="qx-header">
   <div class="qx-header-left">
     <div>
-      <div class="qx-header-title">QuantX &nbsp;<span style="opacity:0.3">|</span>&nbsp; {selected_label} &nbsp;<span style="opacity:0.3">·</span>&nbsp; {tf_label}</div>
-      <div class="qx-header-sub">F&amp;O Intelligence Terminal &nbsp;·&nbsp; Signal threshold {SIGNAL_THRESHOLD}/100 &nbsp;·&nbsp; {lot_size} lot</div>
+      <div class="qx-header-title" style="font-size: 1rem;">Quant<span style="color:#00E676">X</span> · {selected_label} · {tf_label}</div>
+      <div class="qx-header-sub">Signal threshold {SIGNAL_THRESHOLD}/100 · {lot_size} units/lot</div>
     </div>
     {regime_html}
     {ks_html}
   </div>
   <div style="display:flex;align-items:center;gap:0.6rem">
     <span class="qx-chip {'qx-chip-green' if is_open else 'qx-chip-red'}">
-      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:{'#00FFA3' if is_open else '#FF4B4B'};margin-right:4px;vertical-align:middle;animation:qx-pulse 2s infinite"></span>
+      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:{'#00E676' if is_open else '#FF4B4B'};margin-right:4px;vertical-align:middle;animation:qx-pulse 2s infinite"></span>
       NSE {mkt_label}
     </span>
-    <span class="qx-chip qx-chip-gray" style="font-family:'JetBrains Mono',monospace">{ts_now}</span>
   </div>
 </div>
 """
 render_html(header_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# SIGNAL BANNER (Fixed parsing bug using render_html with flat string generation)
+# SIGNAL BANNER
 # ══════════════════════════════════════════════════════════════════════════════
 s      = sig["signal"]
 sc     = "buy" if s == "BUY" else ("sell" if s == "SELL" else "none")
@@ -1553,7 +1493,7 @@ banner_html = f"""
       <div class="qx-signal-meta">
         Entry <strong>{f"₹{sig['entry']:,.2f}" if sig['entry'] else '—'}</strong> &nbsp;·&nbsp;
         SL <strong style="color:#FF6B6B">{sl_txt}</strong> &nbsp;·&nbsp;
-        Target <strong style="color:#00FFA3">{tgt_txt}</strong><br>
+        Target <strong style="color:#00E676">{tgt_txt}</strong><br>
         RSI <strong>{rsi_txt}</strong> &nbsp;·&nbsp;
         ATR <strong>{atr_txt}</strong> &nbsp;·&nbsp;
         ADX <strong>{adx_val:.1f}</strong> &nbsp;·&nbsp;
@@ -1571,82 +1511,66 @@ banner_html = f"""
 render_html(banner_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# METRIC CARDS ROW
+# MOBILE-FIRST METRIC ROW (Using Flex Wrap Grid)
 # ══════════════════════════════════════════════════════════════════════════════
 chg_cls   = "clr-green" if day_chg >= 0 else "clr-red"
 chg_arrow = "▲" if day_chg >= 0 else "▼"
 vol_above = vwap_val > 0 and ltp > vwap_val
+sl_pct = (abs(ltp - (sig["sl"] or ltp)) / ltp * 100) if sig["sl"] and ltp else 0
+rr_pts = abs((sig["target"] or ltp) - ltp) if sig["target"] else 0
+vwap_cls  = "clr-green" if vol_above else "clr-red"
+vwap_side = "ABOVE" if vol_above else "BELOW"
+adx_txt = "STRONG" if adx_val > 25 else ("WEAK" if adx_val < 18 else "MOD")
+adx_cls = "clr-green" if adx_val > 25 else ("clr-red" if adx_val < 18 else "clr-amber")
+wr_cls = "clr-green" if bt["win_rate"] >= 55 else ("clr-amber" if bt["win_rate"] >= 40 else "clr-red")
 
-c1, c2, c3, c4, c5, c6 = st.columns(6)
-
-with c1:
-    card1 = f"""
-    <div class="qx-card qx-card-blue">
-      <div class="qx-card-icon">📈</div>
-      <div class="qx-card-label">LTP · {selected_label}</div>
-      <div class="qx-card-value">₹{ltp:,.2f}</div>
-      <div class="qx-card-sub"><span class="{chg_cls}">{chg_arrow} {abs(day_chg_pct):.2f}%</span> &nbsp;today</div>
-    </div>"""
-    render_html(card1)
-
-with c2:
-    sl_pct = (abs(ltp - (sig["sl"] or ltp)) / ltp * 100) if sig["sl"] and ltp else 0
-    card2 = f"""
-    <div class="qx-card qx-card-red">
-      <div class="qx-card-icon">🛡</div>
-      <div class="qx-card-label">Stop Loss · 1.5× ATR</div>
-      <div class="qx-card-value clr-red">{sl_txt}</div>
-      <div class="qx-card-sub">Risk {sl_pct:.2f}% &nbsp;·&nbsp; ATR ₹{volatility:,.1f}</div>
-    </div>"""
-    render_html(card2)
-
-with c3:
-    rr_pts = abs((sig["target"] or ltp) - ltp) if sig["target"] else 0
-    card3 = f"""
-    <div class="qx-card qx-card-green">
-      <div class="qx-card-icon">🎯</div>
-      <div class="qx-card-label">Target · 1:2 R/R</div>
-      <div class="qx-card-value clr-green">{tgt_txt}</div>
-      <div class="qx-card-sub">Reward ₹{rr_pts:,.1f} &nbsp;·&nbsp; 1:2 ratio</div>
-    </div>"""
-    render_html(card3)
-
-with c4:
-    vwap_cls  = "clr-green" if vol_above else "clr-red"
-    vwap_side = "ABOVE" if vol_above else "BELOW"
-    card4 = f"""
-    <div class="qx-card qx-card-amber">
-      <div class="qx-card-icon">⚖</div>
-      <div class="qx-card-label">VWAP · Institutional</div>
-      <div class="qx-card-value">₹{vwap_val:,.1f}</div>
-      <div class="qx-card-sub">Price <span class="{vwap_cls}">{vwap_side}</span> VWAP</div>
-    </div>"""
-    render_html(card4)
-
-with c5:
-    adx_txt = "STRONG" if adx_val > 25 else ("WEAK" if adx_val < 18 else "MOD")
-    adx_cls = "clr-green" if adx_val > 25 else ("clr-red" if adx_val < 18 else "clr-amber")
-    card5 = f"""
-    <div class="qx-card qx-card-neutral">
-      <div class="qx-card-icon">📡</div>
-      <div class="qx-card-label">ADX · Trend Strength</div>
-      <div class="qx-card-value">{adx_val:.1f}</div>
-      <div class="qx-card-sub"><span class="{adx_cls}">{adx_txt} TREND</span> &nbsp;·&nbsp; RSI {rsi_val:.1f}</div>
-    </div>"""
-    render_html(card5)
-
-with c6:
-    wr_cls = "clr-green" if bt["win_rate"] >= 55 else ("clr-amber" if bt["win_rate"] >= 40 else "clr-red")
-    card6 = f"""
-    <div class="qx-card {'qx-card-green' if bt['win_rate'] >= 55 else ('qx-card-amber' if bt['win_rate'] >= 40 else 'qx-card-red')}">
-      <div class="qx-card-icon">🏆</div>
-      <div class="qx-card-label">Backtest Win Rate</div>
-      <div class="qx-card-value {wr_cls}">{bt['win_rate']}%</div>
-      <div class="qx-card-sub">{bt['wins']}W / {bt['losses']}L &nbsp;·&nbsp; {bt['total']} trades</div>
-    </div>"""
-    render_html(card6)
-
-st.markdown("<div style='height:0.8rem'></div>", unsafe_allow_html=True)
+metrics_html = f"""
+<div class="qx-metrics-grid">
+  <!-- LTP -->
+  <div class="qx-card qx-card-blue">
+    <div class="qx-card-icon">📈</div>
+    <div class="qx-card-label">LTP · {selected_label}</div>
+    <div class="qx-card-value">₹{ltp:,.2f}</div>
+    <div class="qx-card-sub"><span class="{chg_cls}">{chg_arrow} {abs(day_chg_pct):.2f}%</span></div>
+  </div>
+  <!-- SL -->
+  <div class="qx-card qx-card-red">
+    <div class="qx-card-icon">🛡</div>
+    <div class="qx-card-label">Stop Loss</div>
+    <div class="qx-card-value clr-red">{sl_txt}</div>
+    <div class="qx-card-sub">Risk {sl_pct:.2f}%</div>
+  </div>
+  <!-- TGT -->
+  <div class="qx-card qx-card-green">
+    <div class="qx-card-icon">🎯</div>
+    <div class="qx-card-label">Target (1:2)</div>
+    <div class="qx-card-value clr-green">{tgt_txt}</div>
+    <div class="qx-card-sub">Reward ₹{rr_pts:,.0f}</div>
+  </div>
+  <!-- VWAP -->
+  <div class="qx-card qx-card-amber">
+    <div class="qx-card-icon">⚖</div>
+    <div class="qx-card-label">VWAP</div>
+    <div class="qx-card-value">₹{vwap_val:,.0f}</div>
+    <div class="qx-card-sub"><span class="{vwap_cls}">{vwap_side}</span></div>
+  </div>
+  <!-- Trend Strength -->
+  <div class="qx-card qx-card-neutral">
+    <div class="qx-card-icon">📡</div>
+    <div class="qx-card-label">ADX Indicator</div>
+    <div class="qx-card-value">{adx_val:.1f}</div>
+    <div class="qx-card-sub"><span class="{adx_cls}">{adx_txt}</span></div>
+  </div>
+  <!-- Win Rate -->
+  <div class="qx-card {'qx-card-green' if bt['win_rate'] >= 55 else ('qx-card-amber' if bt['win_rate'] >= 40 else 'qx-card-red')}">
+    <div class="qx-card-icon">🏆</div>
+    <div class="qx-card-label">Backtest Win %</div>
+    <div class="qx-card-value {wr_cls}">{bt['win_rate']}%</div>
+    <div class="qx-card-sub">{bt['wins']}W / {bt['losses']}L</div>
+  </div>
+</div>
+"""
+render_html(metrics_html)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TABS
@@ -1810,8 +1734,8 @@ with tab2:
             df_trades.columns = ["Time", "Signal", "Entry", "SL", "Target", "Result", "P&L (R)"]
             st.dataframe(
                 df_trades.style
-                    .applymap(lambda v: "color:#00FFA3" if v == "WIN" else ("color:#FF4B4B" if v == "LOSS" else ""), subset=["Result"])
-                    .applymap(lambda v: "color:#00FFA3" if isinstance(v, float) and v > 0 else ("color:#FF4B4B" if isinstance(v, float) and v < 0 else ""), subset=["P&L (R)"])
+                    .applymap(lambda v: "color:#00E676" if v == "WIN" else ("color:#FF4B4B" if v == "LOSS" else ""), subset=["Result"])
+                    .applymap(lambda v: "color:#00E676" if isinstance(v, float) and v > 0 else ("color:#FF4B4B" if isinstance(v, float) and v < 0 else ""), subset=["P&L (R)"])
                     .format({"Entry": "₹{:,.2f}", "SL": "₹{:,.2f}", "Target": "₹{:,.2f}", "P&L (R)": "{:+.2f}R"}),
                 use_container_width=True,
                 height=220,
@@ -1830,7 +1754,7 @@ with tab3:
         st.markdown('<div class="qx-section">F&O Strike Suggester</div>', unsafe_allow_html=True)
 
         opt_cards_html = f"""
-        <div class="qx-opt-card" style="border-left:3px solid rgba(0,255,163,0.4)">
+        <div class="qx-opt-card" style="border-left:3px solid rgba(0,230,118,0.4)">
           <div class="qx-opt-header">BUY SIGNAL → CALL OPTION (CE)</div>
           <div class="qx-opt-strike">{atm_data['ce']:,} CE</div>
           <div class="qx-opt-meta">
@@ -1854,7 +1778,7 @@ with tab3:
         st.markdown('<div class="qx-section">Index Specifications</div>', unsafe_allow_html=True)
         spec_rows = ""
         for idx_n, idx_t in INDICES.items():
-            active = "rgba(0,255,163,0.04)" if idx_n == selected_label else "transparent"
+            active = "rgba(0,230,118,0.04)" if idx_n == selected_label else "transparent"
             spec_rows += f"""
             <tr style="background:{active}">
               <td style="font-weight:{'700' if idx_n == selected_label else '400'}">
@@ -1900,7 +1824,7 @@ with tab3:
           </div>
         </div>
 
-        <div class="qx-opt-card" style="border-left:3px solid rgba(0,255,163,0.4);margin-top:0.5rem">
+        <div class="qx-opt-card" style="border-left:3px solid rgba(0,230,118,0.4);margin-top:0.5rem">
           <div class="qx-opt-header">Recommended Position</div>
           <div class="qx-opt-strike clr-green">{pos['lots']} lot{'s' if pos['lots'] != 1 else ''}</div>
           <div class="qx-opt-meta">
@@ -1946,7 +1870,7 @@ with tab4:
             bar_fig = go.Figure()
             bars_achieved = list(score_data.values())
             bars_max      = [SCORE_WEIGHTS.get(k.lower().replace(" ","_").replace(".",""), 15) for k in score_data.keys()]
-            bar_colors    = ["rgba(0,255,163,0.7)" if a >= m * 0.7 else
+            bar_colors    = ["rgba(0,230,118,0.7)" if a >= m * 0.7 else
                              ("rgba(255,179,71,0.7)" if a >= m * 0.4 else "rgba(255,75,75,0.6)")
                              for a, m in zip(bars_achieved, bars_max)]
             bar_fig.add_trace(go.Bar(
@@ -2008,7 +1932,7 @@ with tab4:
               <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">Signals</div>
             </div>
             <div style="text-align:center">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#00FFA3">{sess_buy}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#00E676">{sess_buy}</div>
               <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">BUY</div>
             </div>
             <div style="text-align:center">
@@ -2027,7 +1951,7 @@ with tab4:
             df_log.columns = ["Time", "Index", "Signal", "Entry ₹", "SL ₹", "Target ₹", "Score"]
             st.dataframe(
                 df_log.style
-                    .applymap(lambda v: "color:#00FFA3" if v == "BUY" else ("color:#FF4B4B" if v == "SELL" else ""), subset=["Signal"])
+                    .applymap(lambda v: "color:#00E676" if v == "BUY" else ("color:#FF4B4B" if v == "SELL" else ""), subset=["Signal"])
                     .format({"Entry ₹": "₹{:,.2f}", "SL ₹": "₹{:,.2f}", "Target ₹": "₹{:,.2f}", "Score": "{:.0f}"}),
                 use_container_width=True,
                 height=260,
