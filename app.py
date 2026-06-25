@@ -32,10 +32,9 @@ st.set_page_config(
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DESIGN SYSTEM — Premium Dark Terminal Aesthetic
+# DESIGN SYSTEM — Theme-Adaptive Terminal Aesthetic
 # Typography: JetBrains Mono (data) + Inter (UI)
-# Palette: Near-black base · Acid-green accent · Neon-red danger
-# Signature: Scanline texture overlay + glowing metric cards
+# Supporting flawless execution in both Dark and Light System settings.
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
@@ -44,12 +43,9 @@ st.markdown("""
 /* ── Reset & base ─────────────────────────────────────────────────────────── */
 html, body, [class*="css"], .stApp {
   font-family: 'Inter', sans-serif;
-  background-color: #080B0F !important;
-  color: #C8D0DC !important;
 }
-.stApp { background: #080B0F !important; }
 
-/* Scanline texture — the signature element */
+/* Scanline texture — adaptive overlay */
 .stApp::before {
   content: '';
   position: fixed;
@@ -58,8 +54,8 @@ html, body, [class*="css"], .stApp {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
+    rgba(120,120,120,0.015) 2px,
+    rgba(120,120,120,0.015) 4px
   );
   pointer-events: none;
   z-index: 0;
@@ -85,17 +81,13 @@ header[data-testid="stHeader"] {
   max-width: 100% !important;
 }
 
-/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+/* ── Sidebar styling ──────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-  background: #0C1018 !important;
-  border-right: 1px solid rgba(0,255,163,0.08) !important;
+  border-right: 1px solid rgba(120, 120, 120, 0.1) !important;
   padding-top: 0 !important;
 }
 [data-testid="stSidebar"] > div:first-child {
   padding-top: 1.5rem;
-}
-[data-testid="stSidebarContent"] {
-  background: transparent !important;
 }
 
 /* ── Sidebar widgets ──────────────────────────────────────────────────────── */
@@ -107,13 +99,10 @@ header[data-testid="stHeader"] {
   font-weight: 700 !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
-  color: rgba(200,208,220,0.45) !important;
+  opacity: 0.7;
 }
 [data-testid="stSidebar"] [data-baseweb="select"] > div {
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
   border-radius: 8px !important;
-  color: #C8D0DC !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 0.82rem !important;
 }
@@ -122,24 +111,11 @@ header[data-testid="stHeader"] {
   font-size: 0.78rem !important;
   font-weight: 600 !important;
 }
-[data-testid="stSidebar"] hr {
-  border-color: rgba(255,255,255,0.07) !important;
-  margin: 1rem 0 !important;
-}
-
-/* Number inputs */
-[data-testid="stSidebar"] input[type="number"] {
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  color: #C8D0DC !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  border-radius: 6px !important;
-}
 
 /* ── Tab styling ──────────────────────────────────────────────────────────── */
 [data-testid="stTabs"] [data-baseweb="tab-list"] {
   background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  border-bottom: 1px solid rgba(120, 120, 120, 0.15) !important;
   gap: 0 !important;
   padding: 0 !important;
 }
@@ -147,7 +123,6 @@ header[data-testid="stHeader"] {
   background: transparent !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
-  color: rgba(200,208,220,0.45) !important;
   font-family: 'Inter', sans-serif !important;
   font-size: 0.72rem !important;
   font-weight: 700 !important;
@@ -159,11 +134,9 @@ header[data-testid="stHeader"] {
 [data-testid="stTabs"] [aria-selected="true"] {
   color: #00FFA3 !important;
   border-bottom: 2px solid #00FFA3 !important;
-  background: rgba(0,255,163,0.04) !important;
 }
 [data-testid="stTabs"] [data-baseweb="tab"]:hover {
-  color: rgba(200,208,220,0.8) !important;
-  background: rgba(255,255,255,0.03) !important;
+  background: rgba(120, 120, 120, 0.05) !important;
 }
 [data-testid="stTabPanel"] {
   padding-top: 1.5rem !important;
@@ -178,7 +151,7 @@ header[data-testid="stHeader"] {
 
 /* ── Streamlit dataframe ──────────────────────────────────────────────────── */
 [data-testid="stDataFrame"] {
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(120, 120, 120, 0.15) !important;
   border-radius: 10px !important;
   overflow: hidden !important;
 }
@@ -195,10 +168,9 @@ header[data-testid="stHeader"] {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   CUSTOM COMPONENTS
+   CUSTOM THEME ADAPTIVE COMPONENTS
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* ── Wordmark ─────────────────────────────────────────────────────────────── */
 .qx-wordmark {
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.55rem;
@@ -206,19 +178,17 @@ header[data-testid="stHeader"] {
   letter-spacing: -0.04em;
   line-height: 1;
   margin-bottom: 0.1rem;
-  color: #E8EDF4;
 }
-.qx-wordmark .acc { color: #00FFA3; text-shadow: 0 0 20px rgba(0,255,163,0.5); }
+.qx-wordmark .acc { color: #00FFA3; text-shadow: 0 0 20px rgba(0,255,163,0.3); }
 .qx-tagline {
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.35);
   font-weight: 500;
   margin-bottom: 1.8rem;
+  opacity: 0.6;
 }
 
-/* ── Section label ────────────────────────────────────────────────────────── */
 .qx-section {
   display: flex;
   align-items: center;
@@ -227,17 +197,16 @@ header[data-testid="stHeader"] {
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.3);
   margin: 1.4rem 0 0.7rem 0;
+  opacity: 0.5;
 }
 .qx-section::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255,255,255,0.07);
+  background: rgba(120, 120, 120, 0.2);
 }
 
-/* ── Status dot ───────────────────────────────────────────────────────────── */
 .qx-dot {
   display: inline-block;
   width: 6px; height: 6px;
@@ -251,14 +220,13 @@ header[data-testid="stHeader"] {
   50% { opacity: 0.4; transform: scale(0.8); }
 }
 
-/* ── Top header bar ───────────────────────────────────────────────────────── */
 .qx-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 1.2rem;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(120, 120, 120, 0.05);
+  border: 1px solid rgba(120, 120, 120, 0.15);
   border-radius: 12px;
   margin-bottom: 1.2rem;
   backdrop-filter: blur(20px);
@@ -272,15 +240,15 @@ header[data-testid="stHeader"] {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #E8EDF4;
   letter-spacing: -0.01em;
 }
 .qx-header-sub {
   font-size: 0.65rem;
-  color: rgba(200,208,220,0.45);
   letter-spacing: 0.05em;
   margin-top: 0.1rem;
+  opacity: 0.7;
 }
+
 .qx-chip {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
@@ -310,16 +278,15 @@ header[data-testid="stHeader"] {
   color: #5B8CFF;
 }
 .qx-chip-gray {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(200,208,220,0.6);
+  background: rgba(120,120,120,0.1);
+  border: 1px solid rgba(120,120,120,0.2);
 }
 
-/* ── Metric cards ─────────────────────────────────────────────────────────── */
+/* ── Custom Theme Adaptive Cards ──────────────────────────────────────────── */
 .qx-card {
   position: relative;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(120, 120, 120, 0.05);
+  border: 1px solid rgba(120, 120, 120, 0.15);
   border-radius: 14px;
   padding: 1.1rem 1.25rem;
   overflow: hidden;
@@ -329,7 +296,7 @@ header[data-testid="stHeader"] {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 1px;
+  height: 2px;
   opacity: 0.9;
 }
 .qx-card-green { border-color: rgba(0,255,163,0.15); }
@@ -348,15 +315,15 @@ header[data-testid="stHeader"] {
 .qx-card-amber::before { background: linear-gradient(90deg, #FFB347 0%, transparent 70%); }
 .qx-card-amber:hover { border-color: rgba(255,179,71,0.35); box-shadow: 0 0 24px rgba(255,179,71,0.06); }
 
-.qx-card-neutral { border-color: rgba(255,255,255,0.08); }
-.qx-card-neutral::before { background: linear-gradient(90deg, rgba(200,208,220,0.3) 0%, transparent 70%); }
+.qx-card-neutral { border-color: rgba(120, 120, 120, 0.15); }
+.qx-card-neutral::before { background: linear-gradient(90deg, rgba(120, 120, 120, 0.4) 0%, transparent 70%); }
 
 .qx-card-label {
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.4);
+  opacity: 0.6;
   margin-bottom: 0.45rem;
 }
 .qx-card-value {
@@ -365,13 +332,12 @@ header[data-testid="stHeader"] {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #E8EDF4;
 }
 .qx-card-sub {
   font-size: 0.67rem;
-  color: rgba(200,208,220,0.45);
   margin-top: 0.35rem;
   font-weight: 400;
+  opacity: 0.8;
 }
 .qx-card-icon {
   position: absolute;
@@ -381,12 +347,10 @@ header[data-testid="stHeader"] {
   opacity: 0.15;
 }
 
-/* Signal value colors */
 .clr-green  { color: #00FFA3 !important; }
 .clr-red    { color: #FF4B4B !important; }
 .clr-blue   { color: #5B8CFF !important; }
 .clr-amber  { color: #FFB347 !important; }
-.clr-dim    { color: rgba(200,208,220,0.4) !important; }
 
 /* ── Signal banner ────────────────────────────────────────────────────────── */
 .qx-signal-banner {
@@ -417,8 +381,8 @@ header[data-testid="stHeader"] {
 }
 .qx-signal-banner.sell::before { background: #FF4B4B; }
 .qx-signal-banner.none {
-  border-color: rgba(255,255,255,0.07);
-  background: rgba(255,255,255,0.02);
+  border-color: rgba(120, 120, 120, 0.2);
+  background: rgba(120, 120, 120, 0.05);
 }
 
 .qx-signal-main {
@@ -435,15 +399,10 @@ header[data-testid="stHeader"] {
 }
 .qx-signal-meta {
   font-size: 0.72rem;
-  color: rgba(200,208,220,0.55);
   line-height: 1.6;
-}
-.qx-signal-meta strong {
-  color: #E8EDF4;
-  font-family: 'JetBrains Mono', monospace;
+  opacity: 0.9;
 }
 
-/* Score gauge arc */
 .qx-score-wrap {
   text-align: center;
 }
@@ -458,7 +417,7 @@ header[data-testid="stHeader"] {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.4);
+  opacity: 0.6;
   margin-top: 0.2rem;
 }
 
@@ -490,14 +449,14 @@ header[data-testid="stHeader"] {
   color: #FF4B4B;
 }
 
-/* ── MTF table ────────────────────────────────────────────────────────────── */
-.qx-mtf-table {
+/* ── Tables ───────────────────────────────────────────────────────────────── */
+.qx-mtf-table, .qx-pivot-table {
   width: 100%;
   border-collapse: collapse;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.78rem;
 }
-.qx-mtf-table th {
+.qx-mtf-table th, .qx-pivot-table th {
   padding: 0.5rem 0.75rem;
   text-align: left;
   font-family: 'Inter', sans-serif;
@@ -505,16 +464,17 @@ header[data-testid="stHeader"] {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.35);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  opacity: 0.6;
+  border-bottom: 1px solid rgba(120, 120, 120, 0.2);
 }
-.qx-mtf-table td {
+.qx-mtf-table td, .qx-pivot-table td {
   padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(120, 120, 120, 0.1);
   vertical-align: middle;
 }
-.qx-mtf-table tr:last-child td { border-bottom: none; }
-.qx-mtf-table tr:hover td { background: rgba(255,255,255,0.02); }
+.qx-mtf-table tr:last-child td, .qx-pivot-table tr:last-child td { border-bottom: none; }
+.qx-mtf-table tr:hover td, .qx-pivot-table tr:hover td { background: rgba(120, 120, 120, 0.05); }
+
 .qx-mtf-pill {
   display: inline-block;
   padding: 0.18rem 0.6rem;
@@ -524,71 +484,46 @@ header[data-testid="stHeader"] {
 }
 .mtf-bull { background: rgba(0,255,163,0.1); color: #00FFA3; }
 .mtf-bear { background: rgba(255,75,75,0.1); color: #FF4B4B; }
-.mtf-neut { background: rgba(255,255,255,0.06); color: rgba(200,208,220,0.5); }
+.mtf-neut { background: rgba(120,120,120,0.1); }
 
-/* ── Pivot table ──────────────────────────────────────────────────────────── */
-.qx-pivot-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-}
-.qx-pivot-table th {
-  padding: 0.5rem 0.9rem;
-  text-align: left;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(200,208,220,0.35);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.qx-pivot-table td {
-  padding: 0.62rem 0.9rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-.qx-pivot-table tr:last-child td { border-bottom: none; }
-.qx-pivot-table tr:hover td { background: rgba(255,255,255,0.02); }
 .pv-r { color: #FF6B6B; font-weight: 600; }
 .pv-s { color: #00FFA3; font-weight: 600; }
 .pv-p { color: #5B8CFF; font-weight: 600; }
 .pv-pos { color: #00FFA3; }
 .pv-neg { color: #FF4B4B; }
 
-/* ── Trade log ────────────────────────────────────────────────────────────── */
+/* ── Trade logs ───────────────────────────────────────────────────────────── */
 .qx-log-entry {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(120,120,120,0.05);
+  border: 1px solid rgba(120,120,120,0.15);
   border-radius: 10px;
   margin-bottom: 0.4rem;
   transition: border-color 0.2s;
 }
-.qx-log-entry:hover { border-color: rgba(255,255,255,0.12); }
+.qx-log-entry:hover { border-color: rgba(120,120,120,0.3); }
 .qx-log-time {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
-  color: rgba(200,208,220,0.4);
+  opacity: 0.5;
 }
 .qx-log-idx {
   font-size: 0.65rem;
   font-weight: 600;
-  color: rgba(200,208,220,0.6);
+  opacity: 0.7;
   margin-top: 0.15rem;
 }
 .qx-log-price {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #E8EDF4;
 }
 .qx-log-levels {
   font-size: 0.62rem;
-  color: rgba(200,208,220,0.4);
+  opacity: 0.5;
   font-family: 'JetBrains Mono', monospace;
 }
 .qx-log-badge {
@@ -602,10 +537,9 @@ header[data-testid="stHeader"] {
 .qx-log-badge.buy  { background: rgba(0,255,163,0.1); color: #00FFA3; border: 1px solid rgba(0,255,163,0.25); }
 .qx-log-badge.sell { background: rgba(255,75,75,0.1); color: #FF4B4B; border: 1px solid rgba(255,75,75,0.25); }
 
-/* ── Options card ─────────────────────────────────────────────────────────── */
 .qx-opt-card {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(120,120,120,0.05);
+  border: 1px solid rgba(120,120,120,0.15);
   border-radius: 12px;
   padding: 1rem 1.2rem;
   margin-bottom: 0.5rem;
@@ -615,24 +549,23 @@ header[data-testid="stHeader"] {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.35);
+  opacity: 0.6;
   margin-bottom: 0.6rem;
 }
 .qx-opt-strike {
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #E8EDF4;
   letter-spacing: -0.02em;
   line-height: 1;
 }
 .qx-opt-meta {
   font-size: 0.7rem;
-  color: rgba(200,208,220,0.5);
+  opacity: 0.7;
   margin-top: 0.35rem;
 }
 
-/* ── Kill switch ──────────────────────────────────────────────────────────── */
+/* ── Kill switches ────────────────────────────────────────────────────────── */
 .qx-ks-halted {
   background: rgba(255,75,75,0.06);
   border: 1px solid rgba(255,75,75,0.25);
@@ -658,10 +591,9 @@ header[data-testid="stHeader"] {
   text-transform: uppercase;
 }
 
-/* ── Backtest stats row ───────────────────────────────────────────────────── */
 .qx-bt-stat {
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(120,120,120,0.05);
+  border: 1px solid rgba(120,120,120,0.15);
   border-radius: 10px;
   padding: 0.85rem 1rem;
   text-align: center;
@@ -677,11 +609,10 @@ header[data-testid="stHeader"] {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(200,208,220,0.35);
+  opacity: 0.6;
   margin-top: 0.3rem;
 }
 
-/* ── Floating controls button ─────────────────────────────────────────────── */
 .qx-fab {
   position: fixed;
   top: 0.65rem;
@@ -706,17 +637,15 @@ header[data-testid="stHeader"] {
 }
 .qx-fab:hover { background: rgba(0,255,163,0.15); }
 
-/* ── Divider ──────────────────────────────────────────────────────────────── */
 .qx-divider {
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid rgba(120, 120, 120, 0.2);
   margin: 1rem 0;
 }
 
-/* ── Scrollbar ────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(120,120,120,0.2); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,163,0.3); }
 </style>
 """, unsafe_allow_html=True)
@@ -732,7 +661,6 @@ INDICES = {
     "BSE BANKEX":  "BSE-BANKEX.BO",
 }
 
-# Lot sizes for F&O position calculator
 LOT_SIZES = {
     "NIFTY 50":   50,
     "BANK NIFTY": 15,
@@ -741,7 +669,6 @@ LOT_SIZES = {
     "BSE BANKEX": 15,
 }
 
-# Strike price gaps (rounded to nearest)
 STRIKE_GAPS = {
     "NIFTY 50":   50,
     "BANK NIFTY": 100,
@@ -753,17 +680,16 @@ STRIKE_GAPS = {
 TIMEFRAMES = {"1m": "1m", "5m": "5m", "15m": "15m", "1h": "60m"}
 TF_PERIODS  = {"1m": "1d", "5m": "3d", "15m": "5d", "1h": "30d"}
 
-# Signal score weights (total = 100)
 SCORE_WEIGHTS = {
-    "ema_cross":   25,   # EMA 9 vs EMA 21 direction
-    "rsi_zone":    20,   # RSI positioning
-    "vwap_side":   20,   # Price vs VWAP
-    "bb_position": 15,   # Bollinger Band position
-    "volume_conf": 10,   # Volume vs 20-bar average
-    "adx_trend":   10,   # ADX trend strength
+    "ema_cross":   25,
+    "rsi_zone":    20,
+    "vwap_side":   20,
+    "bb_position": 15,
+    "volume_conf": 10,
+    "adx_trend":   10,
 }
 
-SIGNAL_THRESHOLD = 70   # Minimum score to fire a signal
+SIGNAL_THRESHOLD = 70
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PURE PANDAS / NUMPY INDICATORS
@@ -794,10 +720,9 @@ def _vwap(high: pd.Series, low: pd.Series, close: pd.Series, volume: pd.Series) 
 def _bbands(s: pd.Series, n: int = 20, std: float = 2.0):
     mid   = s.rolling(n).mean()
     sigma = s.rolling(n).std()
-    return mid + std * sigma, mid, mid - std * sigma  # upper, mid, lower
+    return mid + std * sigma, mid, mid - std * sigma
 
 def _adx(high: pd.Series, low: pd.Series, close: pd.Series, n: int = 14) -> pd.Series:
-    """Returns ADX series."""
     up   = high.diff()
     down = -low.diff()
     plus_dm  = np.where((up > down) & (up > 0), up, 0.0)
@@ -840,10 +765,9 @@ def fetch_prev_day(ticker: str) -> dict:
 
 @st.cache_data(ttl=60, show_spinner=False)
 def fetch_mtf_bias(ticker: str) -> dict:
-    """Fetch 1m/5m/15m/1h and compute trend bias for each."""
     result = {}
     for tf_label, interval in TIMEFRAMES.items():
-        df = fetch_data.__wrapped__(ticker, interval)  # bypass outer cache
+        df = fetch_data.__wrapped__(ticker, interval)
         if df is None or df.empty or len(df) < 22:
             result[tf_label] = {"bias": "NEUTRAL", "rsi": None, "ema_diff": 0}
             continue
@@ -889,7 +813,6 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
 # MARKET REGIME DETECTION
 # ══════════════════════════════════════════════════════════════════════════════
 def detect_regime(df: pd.DataFrame) -> str:
-    """TRENDING / CHOPPY / VOLATILE"""
     if df.empty or "ADX" not in df.columns:
         return "UNKNOWN"
     try:
@@ -922,7 +845,6 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
 
     try:
         row   = df.iloc[-1]
-        prev  = df.iloc[-2]
         close = float(row["Close"])
         e9    = float(row["EMA9"])
         e21   = float(row["EMA21"])
@@ -942,13 +864,11 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
 
         # BUY scoring
         buy_score = 0
-        # EMA cross
         if e9 > e21:
             ema_str = min((e9 - e21) / e21 * 1000, 1.0)
             buy_score += SCORE_WEIGHTS["ema_cross"] * (0.6 + 0.4 * ema_str)
         scores["ema_cross_buy"] = buy_score
 
-        # RSI zone (50-70 is ideal for BUY)
         rsi_buy = 0
         if 55 <= rsi <= 70:
             rsi_buy = SCORE_WEIGHTS["rsi_zone"]
@@ -957,25 +877,21 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
         buy_score += rsi_buy
         scores["rsi_buy"] = rsi_buy
 
-        # VWAP
         vwap_buy = SCORE_WEIGHTS["vwap_side"] if close > vwap else 0
         buy_score += vwap_buy
         scores["vwap_buy"] = vwap_buy
 
-        # Bollinger position
         bb_range = bb_u - bb_l
         bb_pos   = (close - bb_l) / bb_range if bb_range > 0 else 0.5
         bb_buy   = SCORE_WEIGHTS["bb_position"] * min(bb_pos * 1.2, 1.0)
         buy_score += bb_buy
         scores["bb_buy"] = bb_buy
 
-        # Volume confirmation
         vol_ratio = vol / vol_ma if vol_ma > 0 else 1.0
         vol_buy   = SCORE_WEIGHTS["volume_conf"] * min(vol_ratio / 1.5, 1.0)
         buy_score += vol_buy
         scores["vol_buy"] = vol_buy
 
-        # ADX trend strength
         adx_buy = SCORE_WEIGHTS["adx_trend"] * min(adx / 35, 1.0)
         buy_score += adx_buy
         scores["adx_buy"] = adx_buy
@@ -998,13 +914,12 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
 
         bb_sell = SCORE_WEIGHTS["bb_position"] * min((1 - bb_pos) * 1.2, 1.0)
         sell_score += bb_sell
-        sell_score += vol_buy   # Volume confirmation same for both
+        sell_score += vol_buy
         sell_score += adx_buy
 
         buy_score  = round(min(buy_score, 100), 1)
         sell_score = round(min(sell_score, 100), 1)
 
-        # Determine signal
         signal = "NONE"
         score  = max(buy_score, sell_score)
 
@@ -1048,7 +963,6 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
 # WALK-FORWARD BACKTEST
 # ══════════════════════════════════════════════════════════════════════════════
 def run_backtest(df: pd.DataFrame, lookback: int = 50) -> dict:
-    """Simulate signals on the last `lookback` bars."""
     empty = {"trades": [], "win_rate": 0, "total": 0,
              "wins": 0, "losses": 0, "equity": []}
     if df.empty or len(df) < lookback + 25:
@@ -1090,7 +1004,6 @@ def run_backtest(df: pd.DataFrame, lookback: int = 50) -> dict:
             target = close - 2 * (sl - close)
 
         if signal and len(trades) < lookback:
-            # Simple forward-look exit: next 3 bars
             future = df_bt.iloc[i: i + 4]
             result = "OPEN"
             pnl    = 0
@@ -1138,7 +1051,7 @@ def run_backtest(df: pd.DataFrame, lookback: int = 50) -> dict:
     }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# AUTO KILL-SWITCH (based on backtest win rate)
+# AUTO KILL-SWITCH
 # ══════════════════════════════════════════════════════════════════════════════
 def auto_kill_check(bt: dict, manual_kill: bool) -> tuple[bool, str]:
     if manual_kill:
@@ -1172,8 +1085,8 @@ def get_atm_strike(ltp: float, index_name: str) -> dict:
     atm   = round(ltp / gap) * gap
     return {
         "atm":  atm,
-        "ce":   atm,           # ATM Call (for BUY signal)
-        "pe":   atm,           # ATM Put  (for SELL signal)
+        "ce":   atm,
+        "pe":   atm,
         "itm_ce": atm - gap,
         "itm_pe": atm + gap,
         "otm_ce": atm + gap,
@@ -1182,15 +1095,16 @@ def get_atm_strike(ltp: float, index_name: str) -> dict:
     }
 
 def position_size(capital: float, risk_pct: float, sl_pts: float, lot_size: int) -> dict:
+    # CRITICAL FIX: Ensure 'margin_est' is returned in all evaluation paths.
     if sl_pts <= 0 or lot_size <= 0:
-        return {"lots": 0, "risk_amount": 0, "margin": 0}
+        return {"lots": 0, "risk_amount": 0, "margin_est": 0}
     risk_amt = capital * risk_pct / 100
     risk_per_lot = sl_pts * lot_size
     lots = int(risk_amt / risk_per_lot) if risk_per_lot > 0 else 0
     return {
         "lots": max(lots, 0),
         "risk_amount": round(risk_amt, 0),
-        "margin_est": round(lots * lot_size * 15, 0),  # rough 15 pts premium estimate
+        "margin_est": round(lots * lot_size * 15, 0),
     }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1206,9 +1120,8 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
         subplot_titles=("", "RSI · 14", "Volume"),
     )
 
-    # Subplot title style
     for ann in fig.layout.annotations:
-        ann.update(font=dict(size=9, color="rgba(200,208,220,0.35)",
+        ann.update(font=dict(size=9, color="rgba(120,120,120,0.65)",
                              family="Inter"), x=0.01, xanchor="left")
 
     # ── Candlesticks ────────────────────────────────────────────────────────
@@ -1287,7 +1200,7 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
             name=sig["signal"], showlegend=False,
             hoverinfo="skip",
         ), row=1, col=1)
-        # SL & Target lines
+        
         if sig["sl"]:
             fig.add_hline(y=sig["sl"], line=dict(color="rgba(255,75,75,0.6)", width=1, dash="dot"),
                           annotation_text="  SL", annotation_font=dict(color="#FF4B4B", size=9), row=1, col=1)
@@ -1297,13 +1210,10 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
 
     # ── RSI subplot ──────────────────────────────────────────────────────────
     if "RSI" in df.columns:
-        rsi_color = df["RSI"].apply(
-            lambda v: "rgba(0,255,163,0.8)" if v > 60 else ("rgba(255,75,75,0.8)" if v < 40 else "rgba(200,208,220,0.6)")
-        )
         fig.add_trace(go.Scatter(
             x=df.index, y=df["RSI"],
-            line=dict(color="rgba(200,208,220,0.7)", width=1.3),
-            fill="tozeroy", fillcolor="rgba(200,208,220,0.04)",
+            line=dict(color="rgba(120,120,120,0.7)", width=1.3),
+            fill="tozeroy", fillcolor="rgba(120,120,120,0.04)",
             name="RSI",
         ), row=2, col=1)
         for lv, cl in [(70, "rgba(255,75,75,0.4)"), (60, "rgba(0,255,163,0.35)"),
@@ -1328,24 +1238,23 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
             ), row=3, col=1)
 
     # ── Layout ───────────────────────────────────────────────────────────────
-    GRID  = "rgba(255,255,255,0.05)"
+    # Neutral Grid values allowing flawless rendering in Dark & Light Modes
+    GRID  = "rgba(120,120,120,0.15)"
     PAPER = "rgba(0,0,0,0)"
     fig.update_layout(
         paper_bgcolor=PAPER,
         plot_bgcolor=PAPER,
-        font=dict(family="JetBrains Mono, monospace", size=10, color="rgba(200,208,220,0.7)"),
+        font=dict(family="JetBrains Mono, monospace", size=10),
         margin=dict(l=10, r=100, t=20, b=10),
         legend=dict(
-            bgcolor="rgba(8,11,15,0.7)",
-            bordercolor="rgba(255,255,255,0.08)", borderwidth=1,
+            bgcolor="rgba(120,120,120,0.05)",
+            bordercolor="rgba(120,120,120,0.2)", borderwidth=1,
             font=dict(size=9), x=0.01, y=0.99,
             orientation="h",
         ),
         xaxis_rangeslider_visible=False,
         hovermode="x unified",
         hoverlabel=dict(
-            bgcolor="rgba(12,16,24,0.95)",
-            bordercolor="rgba(255,255,255,0.12)",
             font=dict(size=10, family="JetBrains Mono"),
         ),
         height=580,
@@ -1353,7 +1262,7 @@ def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
     for row_n in [1, 2, 3]:
         fig.update_xaxes(
             gridcolor=GRID, showgrid=True, zeroline=False,
-            showspikes=True, spikecolor="rgba(255,255,255,0.2)",
+            showspikes=True, spikecolor="rgba(120,120,120,0.5)",
             spikedash="dot", spikethickness=1,
             tickfont=dict(size=9),
             row=row_n, col=1,
@@ -1382,17 +1291,17 @@ def build_equity_curve(equity: list) -> go.Figure:
         fill="tozeroy", fillcolor="rgba(0,255,163,0.06)",
         mode="lines", name="Equity",
     ))
-    fig.add_hline(y=equity[0], line=dict(color="rgba(255,255,255,0.2)", width=0.8, dash="dot"))
+    fig.add_hline(y=equity[0], line=dict(color="rgba(120,120,120,0.3)", width=0.8, dash="dot"))
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=10, r=10, t=20, b=10),
         height=200,
         showlegend=False,
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(gridcolor="rgba(255,255,255,0.05)", zeroline=False,
+        yaxis=dict(gridcolor="rgba(120,120,120,0.15)", zeroline=False,
                    tickformat=",.0f", tickfont=dict(size=9)),
         hovermode="x",
-        hoverlabel=dict(bgcolor="rgba(12,16,24,0.95)", font=dict(size=10, family="JetBrains Mono")),
+        hoverlabel=dict(font=dict(size=10, family="JetBrains Mono")),
     )
     return fig
 
@@ -1434,10 +1343,9 @@ def score_arc_svg(score: float, signal: str) -> str:
     r     = 38
     cx, cy = 50, 50
     circumf = 2 * np.pi * r
-    arc_len = pct * circumf * 0.75  # 270° arc
+    arc_len = pct * circumf * 0.75
     gap     = circumf - arc_len
 
-    # SVG arc (270° sweep starting from 135°)
     start_angle = 135 * np.pi / 180
     end_angle   = (135 + 270 * pct) * np.pi / 180
     x1 = cx + r * np.cos(start_angle)
@@ -1451,15 +1359,12 @@ def score_arc_svg(score: float, signal: str) -> str:
 
     return f"""
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="110" height="110">
-      <!-- Track arc (270°) -->
       <path d="M {cx + r * np.cos(135 * np.pi/180):.2f} {cy + r * np.sin(135 * np.pi/180):.2f}
                A {r} {r} 0 1 1 {cx + r * np.cos(45 * np.pi/180):.2f} {cy + r * np.sin(45 * np.pi/180):.2f}"
-            fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"
+            fill="none" stroke="rgba(120,120,120,0.15)" stroke-width="6"
             stroke-linecap="round"/>
-      <!-- Score arc -->
       {'<path d="M ' + f'{x1:.2f} {y1:.2f} A {r} {r} 0 {large} 1 {x2:.2f} {y2:.2f}"' +
        f' fill="none" stroke="{color}" stroke-width="6" stroke-linecap="round"/>' if pct > 0 else ''}
-      <!-- Score text -->
       <text x="50" y="47" text-anchor="middle" dominant-baseline="middle"
             font-family="JetBrains Mono" font-size="18" font-weight="700" fill="{color}">{int(score)}</text>
       <text x="50" y="62" text-anchor="middle" dominant-baseline="middle"
@@ -1469,7 +1374,7 @@ def score_arc_svg(score: float, signal: str) -> str:
     """
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ─── SESSION STATE INIT ──────────────────────────────────────────────────────
+# SESSION STATE INIT
 # ══════════════════════════════════════════════════════════════════════════════
 if "trade_log" not in st.session_state:
     st.session_state.trade_log = []
@@ -1527,8 +1432,8 @@ with st.sidebar:
       <span class="qx-dot" style="background:{dot_c};box-shadow:0 0 6px {dot_c}"></span>
       {mkt_s}
     </div>
-    <p style="font-size:0.63rem;color:rgba(200,208,220,0.35);margin-top:0.3rem;font-family:'JetBrains Mono',monospace">{ts_now}</p>
-    <p style="font-size:0.6rem;color:rgba(200,208,220,0.25);margin-top:0.8rem">
+    <p style="font-size:0.63rem;opacity:0.6;margin-top:0.3rem;font-family:'JetBrains Mono',monospace">{ts_now}</p>
+    <p style="font-size:0.6rem;opacity:0.5;margin-top:0.8rem">
       Signal fires at score ≥ {SIGNAL_THRESHOLD}/100<br>
       Auto-halts if win rate &lt; 40%
     </p>
@@ -1569,7 +1474,7 @@ atm_data = get_atm_strike(ltp, selected_label)
 pos      = position_size(capital, risk_pct, abs(ltp - (sig["sl"] or ltp)), lot_size)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FLOATING FAB
+# FLOATING CONTROL INTERFACES
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <button class="qx-fab" onclick="(function(){
@@ -1755,7 +1660,6 @@ with tab1:
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     with col_right:
-        # MTF panel
         st.markdown('<div class="qx-section">Multi-Timeframe Bias</div>', unsafe_allow_html=True)
         with st.spinner("Loading MTF…"):
             try:
@@ -1775,9 +1679,9 @@ with tab1:
             align_icon = "▲" if bias == "BULLISH" else ("▼" if bias == "BEARISH" else "—")
             mtf_rows += f"""
             <tr>
-              <td style="font-size:0.72rem;color:rgba(200,208,220,0.7);font-weight:600">{tf_k}</td>
+              <td style="font-size:0.72rem;font-weight:600">{tf_k}</td>
               <td><span class="qx-mtf-pill {pill_cls}">{align_icon} {bias[:4]}</span></td>
-              <td style="color:rgba(200,208,220,0.55);font-size:0.7rem">{rsi_v}</td>
+              <td style="opacity:0.8;font-size:0.7rem">{rsi_v}</td>
             </tr>"""
 
         align_total = bull_count - bear_count
@@ -1792,7 +1696,6 @@ with tab1:
         <p style="font-size:0.65rem;margin-top:0.6rem" class="{align_note_color}">Alignment: {align_note}</p>
         """, unsafe_allow_html=True)
 
-        # Pivots
         st.markdown('<div class="qx-section">Fibonacci Pivots</div>', unsafe_allow_html=True)
         if pivots:
             lm = {"R2":("Res 2","pv-r"), "R1":("Res 1","pv-r"), "P":("Pivot","pv-p"),
@@ -1804,7 +1707,7 @@ with tab1:
                 diff = ((v - ltp) / ltp * 100) if ltp else 0
                 dc = "pv-pos" if diff > 0 else "pv-neg"
                 rows_html += f"""<tr>
-                  <td style="color:rgba(200,208,220,0.55);font-size:0.72rem">{name}</td>
+                  <td style="opacity:0.7;font-size:0.72rem">{name}</td>
                   <td class="{cls}" style="font-size:0.72rem;font-weight:700">{k}</td>
                   <td class="{cls}" style="font-weight:600">₹{v:,.0f}</td>
                   <td class="{dc}" style="text-align:right;font-size:0.7rem">{diff:+.2f}%</td>
@@ -1815,13 +1718,12 @@ with tab1:
               <tbody>{rows_html}</tbody>
             </table>""", unsafe_allow_html=True)
         else:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.78rem">Pivot data unavailable (market closed yesterday?)</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.78rem">Pivot data unavailable</p>', unsafe_allow_html=True)
 
-        # Live log
         st.markdown('<div class="qx-section">Signal Log</div>', unsafe_allow_html=True)
         log = st.session_state.get("trade_log", [])
         if not log:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.75rem;padding:0.3rem 0">No signals yet — waiting for confluence…</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.75rem;padding:0.3rem 0">No signals yet — waiting for confluence…</p>', unsafe_allow_html=True)
         else:
             for e in log[:5]:
                 bc = "buy" if e["signal"] == "BUY" else "sell"
@@ -1845,7 +1747,6 @@ with tab1:
 with tab2:
     st.markdown('<div class="qx-section">Walk-Forward Backtest · Last 40 Bars</div>', unsafe_allow_html=True)
 
-    # Kill switch notice
     if kill_sw:
         st.markdown(f'<div class="qx-ks-halted">⛔ &nbsp; AUTO KILL-SWITCH ACTIVE — {kill_reason}</div>', unsafe_allow_html=True)
     else:
@@ -1853,7 +1754,6 @@ with tab2:
 
     st.markdown("<div style='height:0.6rem'></div>", unsafe_allow_html=True)
 
-    # Stats row
     wr     = bt["win_rate"]
     wr_col = "clr-green" if wr >= 55 else ("clr-amber" if wr >= 40 else "clr-red")
     avg_r  = round(sum(t["pnl_r"] for t in bt["trades"]) / len(bt["trades"]), 2) if bt["trades"] else 0
@@ -1885,7 +1785,7 @@ with tab2:
             eq_fig = build_equity_curve(bt["equity"])
             st.plotly_chart(eq_fig, use_container_width=True, config={"displayModeBar": False})
         else:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.78rem">Insufficient trades to plot equity curve.</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.78rem">Insufficient trades to plot equity curve.</p>', unsafe_allow_html=True)
 
     with col_tbl:
         st.markdown('<div class="qx-section">Recent Trades</div>', unsafe_allow_html=True)
@@ -1903,7 +1803,7 @@ with tab2:
                 hide_index=True,
             )
         else:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.78rem">No completed trades in backtest window.</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.78rem">No completed trades in backtest window.</p>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 3 — OPTIONS & POSITION SIZING
@@ -1914,7 +1814,6 @@ with tab3:
     with col_opt:
         st.markdown('<div class="qx-section">F&O Strike Suggester</div>', unsafe_allow_html=True)
 
-        # CE card (for BUY signal)
         ce_color = "qx-card-green" if s == "BUY" else "qx-card-neutral"
         pe_color = "qx-card-red"   if s == "SELL" else "qx-card-neutral"
 
@@ -1943,15 +1842,13 @@ with tab3:
         spec_rows = ""
         for idx_n, idx_t in INDICES.items():
             active = "rgba(0,255,163,0.04)" if idx_n == selected_label else "transparent"
-            border = "rgba(0,255,163,0.3)" if idx_n == selected_label else "transparent"
             spec_rows += f"""
             <tr style="background:{active}">
-              <td style="font-weight:{'700' if idx_n == selected_label else '400'};
-                         color:{'#E8EDF4' if idx_n == selected_label else 'rgba(200,208,220,0.6)'}">
+              <td style="font-weight:{'700' if idx_n == selected_label else '400'}">
                 {idx_n}
               </td>
-              <td style="color:rgba(200,208,220,0.7)">{LOT_SIZES[idx_n]}</td>
-              <td style="color:rgba(200,208,220,0.7)">{STRIKE_GAPS[idx_n]}</td>
+              <td>{LOT_SIZES[idx_n]}</td>
+              <td>{STRIKE_GAPS[idx_n]}</td>
             </tr>"""
         st.markdown(f"""
         <table class="qx-pivot-table">
@@ -1970,20 +1867,20 @@ with tab3:
           <div class="qx-opt-header">Capital & Risk Parameters</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.5rem">
             <div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Capital</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#E8EDF4">₹{capital:,.0f}</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Capital</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700">₹{capital:,.0f}</div>
             </div>
             <div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Risk / Trade</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Risk / Trade</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#FFB347">{risk_pct}%</div>
             </div>
             <div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">SL Distance</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">SL Distance</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#FF6B6B">₹{sl_pts:,.1f}</div>
             </div>
             <div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Lot Size</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#E8EDF4">{lot_size}</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.2rem">Lot Size</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700">{lot_size}</div>
             </div>
           </div>
         </div>
@@ -1994,14 +1891,14 @@ with tab3:
           <div class="qx-opt-meta">
             Max risk: <strong>₹{pos['risk_amount']:,.0f}</strong>
             &nbsp;({risk_pct}% of capital)<br>
-            Qty: <strong>{pos['lots'] * lot_size}</strong> shares/units &nbsp;·&nbsp;
+            Qty: <strong>{pos['lots'] * lot_size}</strong> units &nbsp;·&nbsp;
             Est. margin: <strong>₹{pos['margin_est']:,.0f}</strong>
           </div>
         </div>
 
         <div class="qx-opt-card" style="margin-top:0.5rem;background:rgba(255,179,71,0.03);border-color:rgba(255,179,71,0.15)">
           <div class="qx-opt-header" style="color:rgba(255,179,71,0.6)">Risk Rules — Never Break These</div>
-          <div style="font-size:0.72rem;color:rgba(200,208,220,0.55);line-height:1.8">
+          <div style="font-size:0.72rem;opacity:0.8;line-height:1.8">
             ◈ &nbsp;Risk ≤ 1–2% of capital per trade<br>
             ◈ &nbsp;Max 3 open positions simultaneously<br>
             ◈ &nbsp;Stop at 3× daily loss (₹{capital * risk_pct / 100 * 3:,.0f})<br>
@@ -2047,13 +1944,13 @@ with tab4:
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=0, r=0, t=20, b=0), height=200,
                 showlegend=False,
-                xaxis=dict(tickfont=dict(size=9), gridcolor="rgba(255,255,255,0.04)"),
-                yaxis=dict(gridcolor="rgba(255,255,255,0.04)", tickfont=dict(size=9), range=[0, 28]),
+                xaxis=dict(tickfont=dict(size=9), gridcolor="rgba(120,120,120,0.1)"),
+                yaxis=dict(gridcolor="rgba(120,120,120,0.1)", tickfont=dict(size=9), range=[0, 28]),
                 bargap=0.35,
             )
             st.plotly_chart(bar_fig, use_container_width=True, config={"displayModeBar": False})
         else:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.78rem">Run a signal to see score breakdown.</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.78rem">Run a signal to see score breakdown.</p>', unsafe_allow_html=True)
 
         st.markdown('<div class="qx-section">Current Indicator Snapshot</div>', unsafe_allow_html=True)
         ind_rows = [
@@ -2070,7 +1967,7 @@ with tab4:
         rows_html = ""
         for lbl, val, vc in ind_rows:
             rows_html += f"""<tr>
-              <td style="color:rgba(200,208,220,0.5);font-size:0.72rem">{lbl}</td>
+              <td style="opacity:0.6;font-size:0.72rem">{lbl}</td>
               <td class="{vc}" style="font-weight:600;font-size:0.78rem">{val}</td>
             </tr>"""
         st.markdown(f"""
@@ -2088,16 +1985,16 @@ with tab4:
         <div class="qx-opt-card">
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem">
             <div style="text-align:center">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#E8EDF4">{len(log)}</div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em">Signals</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700">{len(log)}</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">Signals</div>
             </div>
             <div style="text-align:center">
               <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#00FFA3">{sess_buy}</div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em">BUY</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">BUY</div>
             </div>
             <div style="text-align:center">
               <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:#FF4B4B">{sess_sell}</div>
-              <div style="font-size:0.6rem;color:rgba(200,208,220,0.4);text-transform:uppercase;letter-spacing:0.1em">SELL</div>
+              <div style="font-size:0.6rem;opacity:0.5;text-transform:uppercase;letter-spacing:0.1em">SELL</div>
             </div>
           </div>
         </div>
@@ -2125,7 +2022,7 @@ with tab4:
                 use_container_width=True,
             )
         else:
-            st.markdown('<p style="color:rgba(200,208,220,0.3);font-size:0.78rem">No signals recorded this session.</p>', unsafe_allow_html=True)
+            st.markdown('<p style="opacity:0.5;font-size:0.78rem">No signals recorded this session.</p>', unsafe_allow_html=True)
 
         st.markdown('<div class="qx-section">System Status</div>', unsafe_allow_html=True)
         status_items = [
@@ -2139,7 +2036,7 @@ with tab4:
         rows_html = ""
         for lbl, val, vc in status_items:
             rows_html += f"""<tr>
-              <td style="color:rgba(200,208,220,0.5);font-size:0.72rem">{lbl}</td>
+              <td style="opacity:0.6;font-size:0.72rem">{lbl}</td>
               <td class="{vc}" style="font-weight:700;font-size:0.72rem;font-family:'JetBrains Mono',monospace">{val}</td>
             </tr>"""
         st.markdown(f"""
@@ -2154,10 +2051,10 @@ with tab4:
 st.markdown("""
 <hr class="qx-divider" style="margin-top:2rem">
 <div style="display:flex;justify-content:space-between;align-items:center;
-            padding:0.5rem 0;font-size:0.6rem;color:rgba(200,208,220,0.25)">
+            padding:0.5rem 0;font-size:0.6rem;opacity:0.5">
   <span>QuantX v4 &nbsp;·&nbsp; F&amp;O Intelligence Terminal &nbsp;·&nbsp;
         Pure pandas/numpy · Python 3.11</span>
-  <span style="color:rgba(255,179,71,0.5);font-weight:600">
+  <span style="color:rgba(255,179,71,0.8);font-weight:600">
     ⚠ For educational &amp; research use only. Not SEBI-registered investment advice.
   </span>
 </div>
