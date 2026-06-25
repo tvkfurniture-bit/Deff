@@ -28,11 +28,12 @@ st.set_page_config(
     page_title="QuantX · F&O Terminal",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="collapsed", # Collapsed by default for a better mobile view
+    initial_sidebar_state="expanded",
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DESIGN SYSTEM — Theme-Adaptive Terminal Aesthetic
+# Typography: JetBrains Mono (data) + Inter (UI)
 # Supporting execution in both Dark and Light System settings.
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
@@ -53,8 +54,8 @@ html, body, [class*="css"], .stApp {
     0deg,
     transparent,
     transparent 2px,
-    rgba(120,120,120,0.01) 2px,
-    rgba(120,120,120,0.01) 4px
+    rgba(120,120,120,0.015) 2px,
+    rgba(120,120,120,0.015) 4px
   );
   pointer-events: none;
   z-index: 0;
@@ -128,6 +129,17 @@ header[data-testid="stHeader"] {
   overflow: hidden !important;
 }
 
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+[data-testid="stSpinner"] { color: #00E676 !important; }
+
+/* ── Alerts ───────────────────────────────────────────────────────────────── */
+[data-testid="stAlert"] {
+  background: rgba(255,75,75,0.08) !important;
+  border: 1px solid rgba(255,75,75,0.25) !important;
+  border-radius: 10px !important;
+  color: #FF6B6B !important;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    CUSTOM THEME ADAPTIVE COMPONENTS
    ════════════════════════════════════════════════════════════════════════════ */
@@ -189,7 +201,7 @@ header[data-testid="stHeader"] {
   background: rgba(120, 120, 120, 0.05);
   border: 1px solid rgba(120, 120, 120, 0.15);
   border-radius: 12px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
   backdrop-filter: blur(20px);
 }
 .qx-header-left {
@@ -224,14 +236,19 @@ header[data-testid="stHeader"] {
   color: #00E676;
 }
 .qx-chip-red {
-  background: rgba(255,75,75,0.1);
-  border: 1px solid rgba(255,75,75,0.3);
-  color: #FF4B4B;
+  background: rgba(255,61,0,0.1);
+  border: 1px solid rgba(255,61,0,0.3);
+  color: #FF3D00;
 }
 .qx-chip-amber {
   background: rgba(255,179,71,0.1);
   border: 1px solid rgba(255,179,71,0.3);
   color: #FFB347;
+}
+.qx-chip-blue {
+  background: rgba(91,140,255,0.1);
+  border: 1px solid rgba(91,140,255,0.3);
+  color: #5B8CFF;
 }
 .qx-chip-gray {
   background: rgba(120,120,120,0.1);
@@ -248,7 +265,7 @@ header[data-testid="stHeader"] {
 }
 
 .qx-card {
-  flex: 1 1 150px; /* Highly scalable minimum size for phone layout */
+  flex: 1 1 150px;
   position: relative;
   background: rgba(120, 120, 120, 0.05);
   border: 1px solid rgba(120, 120, 120, 0.15);
@@ -268,9 +285,9 @@ header[data-testid="stHeader"] {
 .qx-card-green::before { background: linear-gradient(90deg, #00E676 0%, transparent 70%); }
 .qx-card-green:hover { border-color: rgba(0,230,118,0.35); box-shadow: 0 0 24px rgba(0,230,118,0.06); }
 
-.qx-card-red { border-color: rgba(255,75,75,0.15); }
-.qx-card-red::before { background: linear-gradient(90deg, #FF4B4B 0%, transparent 70%); }
-.qx-card-red:hover { border-color: rgba(255,75,75,0.35); box-shadow: 0 0 24px rgba(255,75,75,0.06); }
+.qx-card-red { border-color: rgba(255,61,0,0.15); }
+.qx-card-red::before { background: linear-gradient(90deg, #FF3D00 0%, transparent 70%); }
+.qx-card-red:hover { border-color: rgba(255,61,0,0.35); box-shadow: 0 0 24px rgba(255,61,0,0.06); }
 
 .qx-card-blue { border-color: rgba(91,140,255,0.15); }
 .qx-card-blue::before { background: linear-gradient(90deg, #5B8CFF 0%, transparent 70%); }
@@ -313,7 +330,7 @@ header[data-testid="stHeader"] {
 }
 
 .clr-green  { color: #00E676 !important; }
-.clr-red    { color: #FF4B4B !important; }
+.clr-red    { color: #FF3D00 !important; }
 .clr-blue   { color: #5B8CFF !important; }
 .clr-amber  { color: #FFB347 !important; }
 
@@ -341,10 +358,10 @@ header[data-testid="stHeader"] {
 }
 .qx-signal-banner.buy::before { background: #00E676; }
 .qx-signal-banner.sell {
-  border-color: rgba(255,75,75,0.35);
-  background: rgba(255,75,75,0.05);
+  border-color: rgba(255,61,0,0.35);
+  background: rgba(255,61,0,0.05);
 }
-.qx-signal-banner.sell::before { background: #FF4B4B; }
+.qx-signal-banner.sell::before { background: #FF3D00; }
 .qx-signal-banner.none {
   border-color: rgba(120, 120, 120, 0.2);
   background: rgba(120, 120, 120, 0.05);
@@ -409,9 +426,9 @@ header[data-testid="stHeader"] {
   color: #FFB347;
 }
 .qx-regime-vol {
-  background: rgba(255,75,75,0.08);
-  border: 1px solid rgba(255,75,75,0.25);
-  color: #FF4B4B;
+  background: rgba(255,61,0,0.08);
+  border: 1px solid rgba(255,61,0,0.25);
+  color: #FF3D00;
 }
 
 /* ── Tables ───────────────────────────────────────────────────────────────── */
@@ -448,14 +465,14 @@ header[data-testid="stHeader"] {
   font-weight: 700;
 }
 .mtf-bull { background: rgba(0,230,118,0.1); color: #00E676; }
-.mtf-bear { background: rgba(255,75,75,0.1); color: #FF4B4B; }
+.mtf-bear { background: rgba(255,61,0,0.1); color: #FF3D00; }
 .mtf-neut { background: rgba(120,120,120,0.1); }
 
 .pv-r { color: #FF6B6B; font-weight: 600; }
 .pv-s { color: #00E676; font-weight: 600; }
 .pv-p { color: #5B8CFF; font-weight: 600; }
 .pv-pos { color: #00E676; }
-.pv-neg { color: #FF4B4B; }
+.pv-neg { color: #FF3D00; }
 
 /* ── Trade logs ───────────────────────────────────────────────────────────── */
 .qx-log-entry {
@@ -500,7 +517,7 @@ header[data-testid="stHeader"] {
   letter-spacing: 0.06em;
 }
 .qx-log-badge.buy  { background: rgba(0,230,118,0.1); color: #00E676; border: 1px solid rgba(0,230,118,0.25); }
-.qx-log-badge.sell { background: rgba(255,75,75,0.1); color: #FF4B4B; border: 1px solid rgba(255,75,75,0.25); }
+.qx-log-badge.sell { background: rgba(255,61,0,0.1); color: #FF3D00; border: 1px solid rgba(255,61,0,0.25); }
 
 .qx-opt-card {
   background: rgba(120,120,120,0.05);
@@ -532,12 +549,12 @@ header[data-testid="stHeader"] {
 
 /* ── Kill switches ────────────────────────────────────────────────────────── */
 .qx-ks-halted {
-  background: rgba(255,75,75,0.06);
-  border: 1px solid rgba(255,75,75,0.25);
+  background: rgba(255,61,0,0.06);
+  border: 1px solid rgba(255,61,0,0.25);
   border-radius: 8px;
   padding: 0.55rem 0.9rem;
   font-size: 0.68rem;
-  color: #FF4B4B;
+  color: #FF3D00;
   text-align: center;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1397,7 +1414,7 @@ with st.expander("⚙️ QUANT-X CONTROL PANEL", expanded=True):
         st.session_state.risk_pct = risk_pct
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DATA FETCHING
+# FETCH & COMPUTE
 # ══════════════════════════════════════════════════════════════════════════════
 with st.spinner("Fetching live market data…"):
     df_raw = fetch_data(ticker, interval)
@@ -1732,10 +1749,12 @@ with tab2:
             df_trades = pd.DataFrame(bt["trades"][-15:])
             df_trades = df_trades[["time", "signal", "entry", "sl", "target", "result", "pnl_r"]]
             df_trades.columns = ["Time", "Signal", "Entry", "SL", "Target", "Result", "P&L (R)"]
+            
+            # Pandas 3.0+ compatibility fix: changing .applymap() to .map()
             st.dataframe(
                 df_trades.style
-                    .applymap(lambda v: "color:#00E676" if v == "WIN" else ("color:#FF4B4B" if v == "LOSS" else ""), subset=["Result"])
-                    .applymap(lambda v: "color:#00E676" if isinstance(v, float) and v > 0 else ("color:#FF4B4B" if isinstance(v, float) and v < 0 else ""), subset=["P&L (R)"])
+                    .map(lambda v: "color:#00E676" if v == "WIN" else ("color:#FF4B4B" if v == "LOSS" else ""), subset=["Result"])
+                    .map(lambda v: "color:#00E676" if isinstance(v, float) and v > 0 else ("color:#FF4B4B" if isinstance(v, float) and v < 0 else ""), subset=["P&L (R)"])
                     .format({"Entry": "₹{:,.2f}", "SL": "₹{:,.2f}", "Target": "₹{:,.2f}", "P&L (R)": "{:+.2f}R"}),
                 use_container_width=True,
                 height=220,
@@ -1763,7 +1782,7 @@ with tab3:
             OTM CE: <strong>{atm_data['otm_ce']:,}</strong>
           </div>
         </div>
-        <div class="qx-opt-card" style="border-left:3px solid rgba(255,75,75,0.4)">
+        <div class="qx-opt-card" style="border-left:3px solid rgba(255,61,0,0.4)">
           <div class="qx-opt-header">SELL SIGNAL → PUT OPTION (PE)</div>
           <div class="qx-opt-strike">{atm_data['pe']:,} PE</div>
           <div class="qx-opt-meta">
@@ -1949,9 +1968,11 @@ with tab4:
             df_log = pd.DataFrame(log)
             df_log = df_log[["time", "index", "signal", "entry", "sl", "target", "score"]].copy()
             df_log.columns = ["Time", "Index", "Signal", "Entry ₹", "SL ₹", "Target ₹", "Score"]
+            
+            # Pandas 3.0+ compatibility fix: changing .applymap() to .map()
             st.dataframe(
                 df_log.style
-                    .applymap(lambda v: "color:#00E676" if v == "BUY" else ("color:#FF4B4B" if v == "SELL" else ""), subset=["Signal"])
+                    .map(lambda v: "color:#00E676" if v == "BUY" else ("color:#FF4B4B" if v == "SELL" else ""), subset=["Signal"])
                     .format({"Entry ₹": "₹{:,.2f}", "SL ₹": "₹{:,.2f}", "Target ₹": "₹{:,.2f}", "Score": "{:.0f}"}),
                 use_container_width=True,
                 height=260,
