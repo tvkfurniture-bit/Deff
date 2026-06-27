@@ -11,7 +11,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from datetime import datetime, timedelta
+from datetime import datetime, time
+import pytz
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -20,6 +21,38 @@ try:
     AUTOREFRESH_AVAILABLE = True
 except ImportError:
     AUTOREFRESH_AVAILABLE = False
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TIMEZONE & MARKET TIME DEFINITIONS
+# ══════════════════════════════════════════════════════════════════════════════
+IST = pytz.timezone('Asia/Kolkata')
+
+def market_status() -> tuple[bool, str, str]:
+    """Calculates true market status based on IST timezone."""
+    now_ist = datetime.now(IST)
+    current_time = now_ist.time()
+    
+    market_open = time(9, 15)
+    market_close = time(15, 30)
+    is_weekday = now_ist.weekday() < 5
+    
+    if not is_weekday:
+        status = "WEEKEND"
+        is_live = False
+    elif current_time < market_open:
+        status = "PRE-MARKET"
+        is_live = False
+    elif current_time > market_close:
+        status = "POST-MARKET"
+        is_live = False
+    else:
+        status = "LIVE"
+        is_live = True
+        
+    time_str = now_ist.strftime("%d %b %Y  %H:%M:%S")
+    return is_live, status, time_str
+
+is_open, mkt_regime_label, ts_now = market_status()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE CONFIG
@@ -32,9 +65,21 @@ st.set_page_config(
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DESIGN SYSTEM — Theme-Adaptive Terminal Aesthetic
-# Typography: JetBrains Mono (data) + Inter (UI)
-# Supporting execution in both Dark and Light System settings.
+# STATE INITIALIZATION (Ensures auto-refresh does not clear selections)
+# ══════════════════════════════════════════════════════════════════════════════
+if "selected_label" not in st.session_state:
+    st.session_state.selected_label = "NIFTY 50"
+if "tf_label" not in st.session_state:
+    st.session_state.tf_label = "5m"
+if "capital" not in st.session_state:
+    st.session_state.capital = 500000
+if "risk_pct" not in st.session_state:
+    st.session_state.risk_pct = 1.0
+if "trade_log" not in st.session_state:
+    st.session_state.trade_log = []
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DESIGN SYSTEM — Adaptive Theme Layout CSS
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
@@ -54,8 +99,8 @@ html, body, [class*="css"], .stApp {
     0deg,
     transparent,
     transparent 2px,
-    rgba(120,120,120,0.015) 2px,
-    rgba(120,120,120,0.015) 4px
+    rgba(120,120,120,0.01) 2px,
+    rgba(120,120,120,0.01) 4px
   );
   pointer-events: none;
   z-index: 0;
@@ -78,7 +123,7 @@ header[data-testid="stHeader"] {
 
 /* ── Sidebar styling ──────────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
-  border-right: 1px solid rgba(120, 120, 120, 0.1) !important;
+  border-right: 1px solid rgba(120, 120, 120, 0.15) !important;
   padding-top: 0 !important;
 }
 [data-testid="stSidebar"] > div:first-child {
@@ -201,7 +246,7 @@ header[data-testid="stHeader"] {
   background: rgba(120, 120, 120, 0.05);
   border: 1px solid rgba(120, 120, 120, 0.15);
   border-radius: 12px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   backdrop-filter: blur(20px);
 }
 .qx-header-left {
@@ -236,26 +281,21 @@ header[data-testid="stHeader"] {
   color: #00E676;
 }
 .qx-chip-red {
-  background: rgba(255,61,0,0.1);
-  border: 1px solid rgba(255,61,0,0.3);
-  color: #FF3D00;
+  background: rgba(255,75,75,0.1);
+  border: 1px solid rgba(255,75,75,0.3);
+  color: #FF4B4B;
 }
 .qx-chip-amber {
   background: rgba(255,179,71,0.1);
   border: 1px solid rgba(255,179,71,0.3);
   color: #FFB347;
 }
-.qx-chip-blue {
-  background: rgba(91,140,255,0.1);
-  border: 1px solid rgba(91,140,255,0.3);
-  color: #5B8CFF;
-}
 .qx-chip-gray {
   background: rgba(120,120,120,0.1);
   border: 1px solid rgba(120,120,120,0.2);
 }
 
-/* ── Mobile Responsive Metrics Flex Grid ─────────────────────────────────── */
+/* ── Responsive Flex Grid ────────────────────────────────────────────────── */
 .qx-metrics-grid {
   display: flex;
   flex-wrap: wrap;
@@ -606,9 +646,7 @@ header[data-testid="stHeader"] {
 ::-webkit-scrollbar-thumb { background: rgba(120,120,120,0.2); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,230,118,0.3); }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TRUE RESPONSIVE MEDIA QUERIES
-   ════════════════════════════════════════════════════════════════════════════ */
+/* ── True Mobile CSS Media Queries ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .block-container {
     padding: 0.5rem 0.5rem 2rem 0.5rem !important;
@@ -656,10 +694,11 @@ INDICES = {
     "BSE BANKEX":  "BSE-BANKEX.BO",
 }
 
+# Accurate dynamically aligned 2025/2026 Lot Sizes
 LOT_SIZES = {
-    "NIFTY 50":   50,
+    "NIFTY 50":   25,
     "BANK NIFTY": 15,
-    "FIN NIFTY":  40,
+    "FIN NIFTY":  25,
     "SENSEX":     10,
     "BSE BANKEX": 15,
 }
@@ -687,49 +726,83 @@ SCORE_WEIGHTS = {
 SIGNAL_THRESHOLD = 70
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PURE PANDAS / NUMPY INDICATORS
+# MATHEMATICALLY RESILIENT INDICATORS (Trap NaN, Inf, and Zero values)
 # ══════════════════════════════════════════════════════════════════════════════
 def _ema(s: pd.Series, n: int) -> pd.Series:
     return s.ewm(span=n, adjust=False).mean()
 
 def _rsi(s: pd.Series, n: int = 14) -> pd.Series:
-    d = s.diff()
-    g = d.clip(lower=0)
-    l = (-d).clip(lower=0)
-    ag = g.ewm(com=n - 1, adjust=False).mean()
-    al = l.ewm(com=n - 1, adjust=False).mean()
-    rs = ag / al.replace(0, np.nan)
-    return 100 - (100 / (1 + rs))
+    try:
+        d = s.diff()
+        g = d.clip(lower=0)
+        l = (-d).clip(lower=0)
+        ag = g.ewm(com=n - 1, adjust=False).mean()
+        al = l.ewm(com=n - 1, adjust=False).mean()
+        
+        # Division by zero protection (replace zeros with NaN then fill with 50)
+        denom = al.replace(0, np.nan)
+        rs = ag / denom
+        rsi_series = 100 - (100 / (1 + rs))
+        return rsi_series.fillna(50)
+    except Exception:
+        return pd.Series(50, index=s.index)
 
 def _atr(high: pd.Series, low: pd.Series, close: pd.Series, n: int = 14) -> pd.Series:
-    pc = close.shift(1)
-    tr = pd.concat([(high - low), (high - pc).abs(), (low - pc).abs()], axis=1).max(axis=1)
-    return tr.ewm(com=n - 1, adjust=False).mean()
+    try:
+        if len(close) < n:
+            return (high - low).rolling(window=max(1, len(close)), min_periods=1).mean().fillna(1.0)
+        pc = close.shift(1)
+        tr = pd.concat([(high - low), (high - pc).abs(), (low - pc).abs()], axis=1).max(axis=1)
+        return tr.ewm(com=n - 1, adjust=False).mean().fillna(1.0)
+    except Exception:
+        return pd.Series(1.0, index=close.index)
 
 def _vwap(high: pd.Series, low: pd.Series, close: pd.Series, volume: pd.Series) -> pd.Series:
-    typical = (high + low + close) / 3
-    cum_tv  = (typical * volume).cumsum()
-    cum_vol = volume.replace(0, np.nan).cumsum()
-    return cum_tv / cum_vol
+    try:
+        typical = (high + low + close) / 3
+        vol_clean = volume.fillna(0)
+        
+        cum_tv = (typical * vol_clean).cumsum()
+        cum_vol = vol_clean.cumsum()
+        
+        # Safe division for zero volume periods
+        denom = cum_vol.replace(0, np.nan)
+        vwap_series = cum_tv / denom
+        return vwap_series.ffill().bfill().fillna(typical)
+    except Exception:
+        return (high + low + close) / 3
 
 def _bbands(s: pd.Series, n: int = 20, std: float = 2.0):
-    mid   = s.rolling(n).mean()
-    sigma = s.rolling(n).std()
-    return mid + std * sigma, mid, mid - std * sigma
+    try:
+        mid   = s.rolling(n).mean()
+        sigma = s.rolling(n).std().fillna(0)
+        return mid + std * sigma, mid, mid - std * sigma
+    except Exception:
+        return s, s, s
 
 def _adx(high: pd.Series, low: pd.Series, close: pd.Series, n: int = 14) -> pd.Series:
-    up   = high.diff()
-    down = -low.diff()
-    plus_dm  = np.where((up > down) & (up > 0), up, 0.0)
-    minus_dm = np.where((down > up) & (down > 0), down, 0.0)
-    tr_s = _atr(high, low, close, n)
-    plus_di  = 100 * pd.Series(plus_dm,  index=high.index).ewm(com=n-1, adjust=False).mean() / tr_s.replace(0, np.nan)
-    minus_di = 100 * pd.Series(minus_dm, index=high.index).ewm(com=n-1, adjust=False).mean() / tr_s.replace(0, np.nan)
-    dx = (100 * (plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan))
-    return dx.ewm(com=n-1, adjust=False).mean(), plus_di, minus_di
+    try:
+        up   = high.diff()
+        down = -low.diff()
+        plus_dm  = np.where((up > down) & (up > 0), up, 0.0)
+        minus_dm = np.where((down > up) & (down > 0), down, 0.0)
+        tr_s = _atr(high, low, close, n).replace(0, np.nan)
+        
+        plus_di  = 100 * pd.Series(plus_dm,  index=high.index).ewm(com=n-1, adjust=False).mean() / tr_s
+        minus_di = 100 * pd.Series(minus_dm, index=high.index).ewm(com=n-1, adjust=False).mean() / tr_s
+        plus_di  = plus_di.fillna(0)
+        minus_di = minus_di.fillna(0)
+        
+        denom = (plus_di + minus_di).replace(0, np.nan)
+        dx = (100 * (plus_di - minus_di).abs() / denom).fillna(0)
+        adx_series = dx.ewm(com=n-1, adjust=False).mean()
+        return adx_series.fillna(0), plus_di, minus_di
+    except Exception:
+        zero_series = pd.Series(0.0, index=close.index)
+        return zero_series, zero_series, zero_series
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DATA FETCHING
+# DATA FETCHING (Holiday-Proof Daily Fallbacks)
 # ══════════════════════════════════════════════════════════════════════════════
 @st.cache_data(ttl=30, show_spinner=False)
 def fetch_data(ticker: str, interval: str) -> pd.DataFrame:
@@ -747,13 +820,26 @@ def fetch_data(ticker: str, interval: str) -> pd.DataFrame:
 
 @st.cache_data(ttl=60, show_spinner=False)
 def fetch_prev_day(ticker: str) -> dict:
+    """Scans historical data back up to 12 days to capture holiday and weekend gaps."""
     try:
-        df = yf.download(ticker, period="5d", interval="1d",
+        df = yf.download(ticker, period="12d", interval="1d",
                          auto_adjust=True, progress=False)
         if df is None or df.empty or len(df) < 2:
             return {}
         df.columns = [c[0] if isinstance(c, tuple) else c for c in df.columns]
-        r = df.iloc[-2]
+        
+        # Localize indices to ensure day boundaries are checked in IST timezone
+        df.index = df.index.tz_localize('UTC').tz_convert(IST) if df.index.tz is None else df.index.tz_convert(IST)
+        
+        # Take daily candle prior to today's date
+        today_ist = datetime.now(IST).date()
+        valid_rows = df[df.index.date < today_ist]
+        
+        if valid_rows.empty:
+            r = df.iloc[-2] if len(df) >= 2 else df.iloc[-1]
+        else:
+            r = valid_rows.iloc[-1]
+            
         return {"high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"])}
     except Exception:
         return {}
@@ -790,19 +876,22 @@ def fetch_mtf_bias(ticker: str) -> dict:
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty or len(df) < 22:
         return df
-    df = df.copy()
-    df["EMA9"]  = _ema(df["Close"], 9)
-    df["EMA21"] = _ema(df["Close"], 21)
-    df["RSI"]   = _rsi(df["Close"], 14)
-    df["ATR"]   = _atr(df["High"], df["Low"], df["Close"], 14)
-    df["VWAP"]  = _vwap(df["High"], df["Low"], df["Close"], df["Volume"])
-    df["BB_U"], df["BB_M"], df["BB_L"] = _bbands(df["Close"], 20, 2.0)
-    adx_vals, plus_di, minus_di = _adx(df["High"], df["Low"], df["Close"], 14)
-    df["ADX"]      = adx_vals
-    df["PLUS_DI"]  = plus_di
-    df["MINUS_DI"] = minus_di
-    df["VOL_MA20"] = df["Volume"].rolling(20).mean()
-    return df
+    try:
+        df = df.copy()
+        df["EMA9"]  = _ema(df["Close"], 9)
+        df["EMA21"] = _ema(df["Close"], 21)
+        df["RSI"]   = _rsi(df["Close"], 14)
+        df["ATR"]   = _atr(df["High"], df["Low"], df["Close"], 14)
+        df["VWAP"]  = _vwap(df["High"], df["Low"], df["Close"], df["Volume"])
+        df["BB_U"], df["BB_M"], df["BB_L"] = _bbands(df["Close"], 20, 2.0)
+        adx_vals, plus_di, minus_di = _adx(df["High"], df["Low"], df["Close"], 14)
+        df["ADX"]      = adx_vals
+        df["PLUS_DI"]  = plus_di
+        df["MINUS_DI"] = minus_di
+        df["VOL_MA20"] = df["Volume"].rolling(20).mean().fillna(df["Volume"])
+        return df
+    except Exception:
+        return df
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MARKET REGIME DETECTION
@@ -814,7 +903,7 @@ def detect_regime(df: pd.DataFrame) -> str:
         adx  = float(df["ADX"].iloc[-1])
         atr  = float(df["ATR"].iloc[-1])
         close = float(df["Close"].iloc[-1])
-        atr_pct = atr / close * 100
+        atr_pct = (atr / close * 100) if close > 0 else 0
         if atr_pct > 1.5:
             return "VOLATILE"
         if adx >= 22:
@@ -860,7 +949,7 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
         # BUY scoring
         buy_score = 0
         if e9 > e21:
-            ema_str = min((e9 - e21) / e21 * 1000, 1.0)
+            ema_str = min((e9 - e21) / e21 * 1000, 1.0) if e21 > 0 else 0
             buy_score += SCORE_WEIGHTS["ema_cross"] * (0.6 + 0.4 * ema_str)
         scores["ema_cross_buy"] = buy_score
 
@@ -894,7 +983,7 @@ def score_signal(df: pd.DataFrame, kill_switch: bool, regime: str) -> dict:
         # SELL scoring
         sell_score = 0
         if e9 < e21:
-            ema_str = min((e21 - e9) / e21 * 1000, 1.0)
+            ema_str = min((e21 - e9) / e21 * 1000, 1.0) if e21 > 0 else 0
             sell_score += SCORE_WEIGHTS["ema_cross"] * (0.6 + 0.4 * ema_str)
 
         rsi_sell = 0
@@ -1046,372 +1135,21 @@ def run_backtest(df: pd.DataFrame, lookback: int = 50) -> dict:
     }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# AUTO KILL-SWITCH
+# DATA ALIGNMENT CONTROLS
 # ══════════════════════════════════════════════════════════════════════════════
-def auto_kill_check(bt: dict, manual_kill: bool) -> tuple[bool, str]:
-    if manual_kill:
-        return True, "Manual kill switch engaged"
-    if bt["total"] >= 5 and bt["win_rate"] < 40:
-        return True, f"Win rate {bt['win_rate']}% < 40% threshold — auto-halted"
-    return False, ""
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PIVOT LEVELS (Fibonacci method)
-# ══════════════════════════════════════════════════════════════════════════════
-def calculate_pivots(ohlc: dict) -> dict:
-    if not ohlc:
-        return {}
-    H, L, C = ohlc["high"], ohlc["low"], ohlc["close"]
-    R = H - L
-    P = (H + L + C) / 3
-    return {
-        "R2": P + 0.618 * R,
-        "R1": P + 0.382 * R,
-        "P":  P,
-        "S1": P - 0.382 * R,
-        "S2": P - 0.618 * R,
-    }
-
-# ══════════════════════════════════════════════════════════════════════════════
-# OPTIONS INTELLIGENCE
-# ══════════════════════════════════════════════════════════════════════════════
-def get_atm_strike(ltp: float, index_name: str) -> dict:
-    gap = STRIKE_GAPS.get(index_name, 50)
-    atm   = round(ltp / gap) * gap
-    return {
-        "atm":  atm,
-        "ce":   atm,
-        "pe":   atm,
-        "itm_ce": atm - gap,
-        "itm_pe": atm + gap,
-        "otm_ce": atm + gap,
-        "otm_pe": atm - gap,
-        "gap":  gap,
-    }
-
-def position_size(capital: float, risk_pct: float, sl_pts: float, lot_size: int) -> dict:
-    if sl_pts <= 0 or lot_size <= 0:
-        return {"lots": 0, "risk_amount": 0, "margin_est": 0}
-    risk_amt = capital * risk_pct / 100
-    risk_per_lot = sl_pts * lot_size
-    lots = int(risk_amt / risk_per_lot) if risk_per_lot > 0 else 0
-    return {
-        "lots": max(lots, 0),
-        "risk_amount": round(risk_amt, 0),
-        "margin_est": round(lots * lot_size * 15, 0),
-    }
-
-# ══════════════════════════════════════════════════════════════════════════════
-# CHART BUILDER
-# ══════════════════════════════════════════════════════════════════════════════
-def build_chart(df: pd.DataFrame, pivots: dict, sig: dict,
-                show_ema: bool, show_vwap: bool, show_bb: bool) -> go.Figure:
-
-    fig = make_subplots(
-        rows=3, cols=1, shared_xaxes=True,
-        row_heights=[0.60, 0.20, 0.20],
-        vertical_spacing=0.025,
-        subplot_titles=("", "RSI · 14", "Volume"),
-    )
-
-    for ann in fig.layout.annotations:
-        ann.update(font=dict(size=9, color="rgba(120,120,120,0.65)",
-                             family="Inter"), x=0.01, xanchor="left")
-
-    # ── Candlesticks ────────────────────────────────────────────────────────
-    fig.add_trace(go.Candlestick(
-        x=df.index,
-        open=df["Open"], high=df["High"],
-        low=df["Low"],   close=df["Close"],
-        increasing=dict(line=dict(color="#00E676", width=1),
-                        fillcolor="rgba(0,230,118,0.5)"),
-        decreasing=dict(line=dict(color="#FF4B4B", width=1),
-                        fillcolor="rgba(255,75,75,0.5)"),
-        name="Price", showlegend=False,
-    ), row=1, col=1)
-
-    # ── EMAs ────────────────────────────────────────────────────────────────
-    if show_ema and "EMA9" in df.columns:
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["EMA9"],
-            line=dict(color="#FFD700", width=1.2),
-            name="EMA 9", hoverinfo="skip",
-        ), row=1, col=1)
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["EMA21"],
-            line=dict(color="#BB88FF", width=1.2),
-            name="EMA 21", hoverinfo="skip",
-        ), row=1, col=1)
-
-    # ── VWAP ────────────────────────────────────────────────────────────────
-    if show_vwap and "VWAP" in df.columns:
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["VWAP"],
-            line=dict(color="#5B8CFF", width=1.2, dash="dot"),
-            name="VWAP", hoverinfo="skip",
-        ), row=1, col=1)
-
-    # ── Bollinger Bands ──────────────────────────────────────────────────────
-    if show_bb and "BB_U" in df.columns:
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["BB_U"],
-            line=dict(color="rgba(255,179,71,0.4)", width=0.8),
-            name="BB Upper", hoverinfo="skip", showlegend=False,
-        ), row=1, col=1)
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["BB_L"],
-            line=dict(color="rgba(255,179,71,0.4)", width=0.8),
-            name="BB Lower", hoverinfo="skip", showlegend=False,
-            fill="tonexty", fillcolor="rgba(255,179,71,0.02)",
-        ), row=1, col=1)
-
-    # ── Pivot levels ─────────────────────────────────────────────────────────
-    pv_style = {
-        "R2": ("#FF4B4B", "dash"), "R1": ("#FF8888", "dot"),
-        "P":  ("#5B8CFF", "dash"),
-        "S1": ("#66EEB0", "dot"),  "S2": ("#00E676", "dash"),
-    }
-    for lvl, val in pivots.items():
-        col, dsh = pv_style.get(lvl, ("#888", "dash"))
-        fig.add_hline(
-            y=val, line=dict(color=col, width=0.8, dash=dsh),
-            annotation_text=f"  {lvl} {val:,.0f}",
-            annotation_font=dict(color=col, size=9, family="JetBrains Mono"),
-            annotation_position="right", row=1, col=1,
-        )
-
-    # ── Signal markers ───────────────────────────────────────────────────────
-    if sig["signal"] != "NONE" and sig["entry"]:
-        icon  = "▲" if sig["signal"] == "BUY" else "▼"
-        color = "#00E676" if sig["signal"] == "BUY" else "#FF4B4B"
-        fig.add_trace(go.Scatter(
-            x=[df.index[-1]], y=[sig["entry"]],
-            mode="markers+text",
-            marker=dict(size=12, color=color, symbol="triangle-up" if sig["signal"] == "BUY" else "triangle-down"),
-            text=[f" {icon} {sig['signal']}"],
-            textposition="top center",
-            textfont=dict(color=color, size=11, family="JetBrains Mono"),
-            name=sig["signal"], showlegend=False,
-            hoverinfo="skip",
-        ), row=1, col=1)
-        
-        if sig["sl"]:
-            fig.add_hline(y=sig["sl"], line=dict(color="rgba(255,75,75,0.6)", width=1, dash="dot"),
-                          annotation_text="  SL", annotation_font=dict(color="#FF4B4B", size=9), row=1, col=1)
-        if sig["target"]:
-            fig.add_hline(y=sig["target"], line=dict(color="rgba(0,230,118,0.6)", width=1, dash="dot"),
-                          annotation_text="  TGT", annotation_font=dict(color="#00E676", size=9), row=1, col=1)
-
-    # ── RSI subplot ──────────────────────────────────────────────────────────
-    if "RSI" in df.columns:
-        fig.add_trace(go.Scatter(
-            x=df.index, y=df["RSI"],
-            line=dict(color="rgba(120,120,120,0.7)", width=1.3),
-            fill="tozeroy", fillcolor="rgba(120,120,120,0.04)",
-            name="RSI",
-        ), row=2, col=1)
-        for lv, cl in [(70, "rgba(255,75,75,0.4)"), (60, "rgba(0,230,118,0.35)"),
-                       (40, "rgba(255,75,75,0.35)"), (30, "rgba(255,75,75,0.4)")]:
-            fig.add_hline(y=lv, line=dict(color=cl, width=0.6, dash="dot"), row=2, col=1)
-        fig.add_hrect(y0=60, y1=70, fillcolor="rgba(0,230,118,0.04)", line_width=0, row=2, col=1)
-        fig.add_hrect(y0=30, y1=40, fillcolor="rgba(255,75,75,0.04)", line_width=0, row=2, col=1)
-
-    # ── Volume subplot ───────────────────────────────────────────────────────
-    if "Volume" in df.columns:
-        vol_colors = ["rgba(0,230,118,0.5)" if float(c) >= float(o) else "rgba(255,75,75,0.5)"
-                      for c, o in zip(df["Close"], df["Open"])]
-        fig.add_trace(go.Bar(
-            x=df.index, y=df["Volume"],
-            marker_color=vol_colors, name="Volume",
-        ), row=3, col=1)
-        if "VOL_MA20" in df.columns:
-            fig.add_trace(go.Scatter(
-                x=df.index, y=df["VOL_MA20"],
-                line=dict(color="rgba(255,179,71,0.7)", width=1.2),
-                name="Vol MA20", hoverinfo="skip",
-            ), row=3, col=1)
-
-    # ── Layout ───────────────────────────────────────────────────────────────
-    GRID  = "rgba(120,120,120,0.15)"
-    PAPER = "rgba(0,0,0,0)"
-    fig.update_layout(
-        paper_bgcolor=PAPER,
-        plot_bgcolor=PAPER,
-        font=dict(family="JetBrains Mono, monospace", size=10),
-        margin=dict(l=10, r=100, t=20, b=10),
-        legend=dict(
-            bgcolor="rgba(120,120,120,0.05)",
-            bordercolor="rgba(120,120,120,0.2)", borderwidth=1,
-            font=dict(size=9), x=0.01, y=0.99,
-            orientation="h",
-        ),
-        xaxis_rangeslider_visible=False,
-        hovermode="x unified",
-        hoverlabel=dict(
-            font=dict(size=10, family="JetBrains Mono"),
-        ),
-        height=500 if st.session_state.get('is_mobile', False) else 580,
-    )
-    for row_n in [1, 2, 3]:
-        fig.update_xaxes(
-            gridcolor=GRID, showgrid=True, zeroline=False,
-            showspikes=True, spikecolor="rgba(120,120,120,0.5)",
-            spikedash="dot", spikethickness=1,
-            tickfont=dict(size=9),
-            row=row_n, col=1,
-        )
-        fig.update_yaxes(
-            gridcolor=GRID, showgrid=True, zeroline=False,
-            tickfont=dict(size=9),
-            row=row_n, col=1,
-        )
-    fig.update_yaxes(tickformat=",.0f", row=1, col=1)
-    fig.update_yaxes(title_text="RSI", range=[0, 100], tickformat=".0f",
-                     tickfont=dict(size=8), row=2, col=1)
-    fig.update_yaxes(title_text="Vol", tickformat=".2s",
-                     tickfont=dict(size=8), row=3, col=1)
-    return fig
-
-# ══════════════════════════════════════════════════════════════════════════════
-# EQUITY CURVE CHART
-# ══════════════════════════════════════════════════════════════════════════════
-def build_equity_curve(equity: list) -> go.Figure:
-    fig = go.Figure()
-    x   = list(range(len(equity)))
-    fig.add_trace(go.Scatter(
-        x=x, y=equity,
-        line=dict(color="#00E676", width=2),
-        fill="tozeroy", fillcolor="rgba(0,230,118,0.06)",
-        mode="lines", name="Equity",
-    ))
-    fig.add_hline(y=equity[0], line=dict(color="rgba(120,120,120,0.3)", width=0.8, dash="dot"))
-    fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=20, b=10),
-        height=180,
-        showlegend=False,
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        yaxis=dict(gridcolor="rgba(120,120,120,0.15)", zeroline=False,
-                   tickformat=",.0f", tickfont=dict(size=9)),
-        hovermode="x",
-        hoverlabel=dict(font=dict(size=10, family="JetBrains Mono")),
-    )
-    return fig
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TRADE LOG
-# ══════════════════════════════════════════════════════════════════════════════
-def update_trade_log(sig: dict, index_name: str):
-    if "trade_log" not in st.session_state:
-        st.session_state.trade_log = []
-    if sig["signal"] != "NONE" and sig["entry"]:
-        log = st.session_state.trade_log
-        if not log or log[0]["signal"] != sig["signal"] or log[0]["index"] != index_name:
-            st.session_state.trade_log = [{
-                "time":   datetime.now().strftime("%H:%M:%S"),
-                "index":  index_name,
-                "signal": sig["signal"],
-                "entry":  sig["entry"],
-                "sl":     sig["sl"],
-                "target": sig["target"],
-                "score":  sig.get("score", 0),
-            }] + log[:14]
-
-# ══════════════════════════════════════════════════════════════════════════════
-# MARKET STATUS (IST)
-# ══════════════════════════════════════════════════════════════════════════════
-def market_status() -> tuple[bool, str]:
-    now = datetime.now()
-    mo  = now.replace(hour=9,  minute=15, second=0, microsecond=0)
-    mc  = now.replace(hour=15, minute=30, second=0, microsecond=0)
-    is_open = mo <= now <= mc and now.weekday() < 5
-    return is_open, now.strftime("%d %b %Y  %H:%M:%S")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SCORE ARC SVG
-# ══════════════════════════════════════════════════════════════════════════════
-def score_arc_svg(score: float, signal: str) -> str:
-    color = "#00E676" if signal == "BUY" else ("#FF4B4B" if signal == "SELL" else "#5B8CFF")
-    pct   = score / 100
-    r     = 38
-    cx, cy = 50, 50
-    circumf = 2 * np.pi * r
-    arc_len = pct * circumf * 0.75
-    gap     = circumf - arc_len
-
-    start_angle = 135 * np.pi / 180
-    end_angle   = (135 + 270 * pct) * np.pi / 180
-    x1 = cx + r * np.cos(start_angle)
-    y1 = cy + r * np.sin(start_angle)
-    x2 = cx + r * np.cos(end_angle)
-    y2 = cy + r * np.sin(end_angle)
-    large = 1 if 270 * pct > 180 else 0
-
-    sig_color = {"BUY": "#00E676", "SELL": "#FF4B4B", "NONE": "#5B8CFF"}.get(signal, "#5B8CFF")
-    sig_label = signal if signal != "NONE" else "WAIT"
-
-    svg_str = f"""
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
-      <path d="M {cx + r * np.cos(135 * np.pi/180):.2f} {cy + r * np.sin(135 * np.pi/180):.2f} A {r} {r} 0 1 1 {cx + r * np.cos(45 * np.pi/180):.2f} {cy + r * np.sin(45 * np.pi/180):.2f}" fill="none" stroke="rgba(120,120,120,0.15)" stroke-width="6" stroke-linecap="round"/>
-      {'<path d="M ' + f'{x1:.2f} {y1:.2f} A {r} {r} 0 {large} 1 {x2:.2f} {y2:.2f}"' + f' fill="none" stroke="{color}" stroke-width="6" stroke-linecap="round"/>' if pct > 0 else ''}
-      <text x="50" y="47" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="18" font-weight="700" fill="{color}">{int(score)}</text>
-      <text x="50" y="62" text-anchor="middle" dominant-baseline="middle" font-family="Inter" font-size="6.5" font-weight="700" fill="{sig_color}" letter-spacing="1">{sig_label}</text>
-    </svg>
-    """
-    return " ".join(svg_str.split())
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SESSION STATE INIT
-# ══════════════════════════════════════════════════════════════════════════════
-if "trade_log" not in st.session_state:
-    st.session_state.trade_log = []
-if "capital" not in st.session_state:
-    st.session_state.capital = 500000
-if "risk_pct" not in st.session_state:
-    st.session_state.risk_pct = 1.0
-
-is_open, ts_now = market_status()
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
-with st.sidebar:
-    st.markdown(
-        '<div class="qx-wordmark">Quant<span class="acc">X</span></div>'
-        '<div class="qx-tagline">Diagnostics & Logs</div>',
-        unsafe_allow_html=True,
-    )
-    
-    st.markdown('<div class="qx-section">Indicator Filters</div>', unsafe_allow_html=True)
-    show_ema  = st.toggle("EMA 9 / 21",        value=True)
-    show_vwap = st.toggle("VWAP",              value=True)
-    show_bb   = st.toggle("Bollinger Bands",   value=False)
-    
-    st.markdown('<div class="qx-section">Platform Overrides</div>', unsafe_allow_html=True)
-    manual_kill = st.toggle("System Kill Switch", value=False)
-    
-    st.markdown('<div class="qx-section">Auto Refresh</div>', unsafe_allow_html=True)
-    refresh_sec = st.slider("Interval (sec)", 15, 120, 30, 5, label_visibility="collapsed")
-    if AUTOREFRESH_AVAILABLE:
-        st_autorefresh(interval=refresh_sec * 1000, key="qx_refresh")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# NATIVE INTERACTIVE CONTROL EXPANDER (100% Functional Mobile Alternative)
-# ══════════════════════════════════════════════════════════════════════════════
+# Native interactive controls tied directly to Streamlit Session State keys
 with st.expander("⚙️ QUANT-X CONTROL PANEL", expanded=True):
     col_c1, col_c2, col_c3 = st.columns([1, 1, 1.2])
     with col_c1:
-        selected_label = st.selectbox("Market Asset Index", list(INDICES.keys()))
+        selected_label = st.selectbox("Market Asset Index", list(INDICES.keys()), key="selected_label")
         ticker   = INDICES[selected_label]
         lot_size = LOT_SIZES[selected_label]
     with col_c2:
-        tf_label = st.selectbox("Data Timeframe Interval", list(TIMEFRAMES.keys()), index=1)
+        tf_label = st.selectbox("Data Timeframe Interval", list(TIMEFRAMES.keys()), key="tf_label")
         interval = TIMEFRAMES[tf_label]
     with col_c3:
-        capital = st.number_input("Account Margin Capital (₹)", value=st.session_state.capital, step=50000, min_value=10000)
-        risk_pct = st.slider("Risk Exposure per Trade (%)", 0.5, 3.0, st.session_state.risk_pct, 0.25)
-        st.session_state.capital  = capital
-        st.session_state.risk_pct = risk_pct
+        capital = st.number_input("Account Margin Capital (₹)", step=50000, min_value=10000, key="capital")
+        risk_pct = st.slider("Risk Exposure per Trade (%)", 0.5, 3.0, step=0.25, key="risk_pct")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FETCH & COMPUTE
@@ -1457,7 +1195,6 @@ regime_html = {
 }.get(regime, '<span class="qx-regime qx-regime-chop">◈ UNKNOWN</span>')
 
 dot_c = "#00E676" if is_open else "#FF4B4B"
-mkt_label = "LIVE" if is_open else "CLOSED"
 score = sig.get("score", 0)
 
 ks_html = ""
@@ -1476,8 +1213,8 @@ header_html = f"""
   </div>
   <div style="display:flex;align-items:center;gap:0.6rem">
     <span class="qx-chip {'qx-chip-green' if is_open else 'qx-chip-red'}">
-      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:{'#00E676' if is_open else '#FF4B4B'};margin-right:4px;vertical-align:middle;animation:qx-pulse 2s infinite"></span>
-      NSE {mkt_label}
+      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:{dot_c};margin-right:4px;vertical-align:middle;animation:qx-pulse 2s infinite"></span>
+      NSE {mkt_regime_label}
     </span>
   </div>
 </div>
@@ -1782,7 +1519,7 @@ with tab3:
             OTM CE: <strong>{atm_data['otm_ce']:,}</strong>
           </div>
         </div>
-        <div class="qx-opt-card" style="border-left:3px solid rgba(255,61,0,0.4)">
+        <div class="qx-opt-card" style="border-left:3px solid rgba(255,75,75,0.4)">
           <div class="qx-opt-header">SELL SIGNAL → PUT OPTION (PE)</div>
           <div class="qx-opt-strike">{atm_data['pe']:,} PE</div>
           <div class="qx-opt-meta">
