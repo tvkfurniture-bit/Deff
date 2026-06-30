@@ -602,9 +602,16 @@ with st.sidebar:
         st.markdown('<div class="ks-active">✅ SIGNALS ACTIVE</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-header">Auto Refresh</div>', unsafe_allow_html=True)
-    refresh_sec = st.slider("Interval (sec)", 15, 120, 30, 5, label_visibility="collapsed")
+    refresh_sec = st.slider("Interval (sec)", 5, 120, 5, 5, label_visibility="collapsed")
     if AUTOREFRESH_AVAILABLE:
         st_autorefresh(interval=refresh_sec * 1000, key="autorefresh")
+    if refresh_sec < 30:
+        st.markdown(
+            '<p style="font-size:0.64rem;color:rgba(255,179,71,0.75);margin-top:0.3rem">'
+            '⚠ Data is cached for 30s — refreshing faster than that just '
+            're-renders the same values and adds load.</p>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown("---")
     dot_color   = "#00CC88" if is_open_mkt else "#FF4B4B"
